@@ -5,12 +5,12 @@ import { map, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export const secretSlugGuard: CanActivateFn = (route) => {
-  const http   = inject(HttpClient);
+  const http = inject(HttpClient);
   const router = inject(Router);
-  const slug   = route.params['slug'] as string;
+  const slug = route.params['slug'] as string;
 
   return http.get<{ valid: boolean }>(`${environment.api.baseUrl}/admin/verify-slug/${slug}`).pipe(
-    map(res => {
+    map((res) => {
       if (res.valid) return true;
       router.navigate(['/']);
       return false;
@@ -18,6 +18,6 @@ export const secretSlugGuard: CanActivateFn = (route) => {
     catchError(() => {
       router.navigate(['/']);
       return of(false);
-    })
+    }),
   );
 };

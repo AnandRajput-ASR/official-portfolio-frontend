@@ -9,7 +9,7 @@ import { GlobalLoaderComponent } from './shared/components/global-loader/global-
   template: `
     <app-global-loader />
     <router-outlet />
-  `
+  `,
 })
 export class AppComponent {
   protected readonly title = signal('official-portfolio-frontend');

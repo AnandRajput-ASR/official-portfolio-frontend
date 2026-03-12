@@ -20,12 +20,12 @@ export class LoadingService {
 
   /** Start loading for a named key */
   start(key: string): void {
-    this._active.update(s => new Set(s).add(key));
+    this._active.update((s) => new Set(s).add(key));
   }
 
   /** Stop loading for a named key */
   stop(key: string): void {
-    this._active.update(s => {
+    this._active.update((s) => {
       const next = new Set(s);
       next.delete(key);
       return next;

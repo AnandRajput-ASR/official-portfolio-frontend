@@ -36,7 +36,7 @@ export class ResumeService {
    * Emits { type:'progress', percent } → { type:'complete', result } | { type:'error', error }
    */
   uploadResumeWithProgress(file: File, token: string): Observable<UploadProgress> {
-    return new Observable(observer => {
+    return new Observable((observer) => {
       const reader = new FileReader();
 
       reader.onload = () => {

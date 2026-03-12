@@ -8,19 +8,24 @@ import { AuthResponse } from '../models/portfolio.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'portfolio_admin_token';
-  private readonly USER_KEY  = 'portfolio_admin_user';
+  private readonly USER_KEY = 'portfolio_admin_user';
   private loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   login(username: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.api.baseUrl}/auth/login`, { username, password }).pipe(
-      tap(res => {
-        localStorage.setItem(this.TOKEN_KEY, res.token);
-        localStorage.setItem(this.USER_KEY, res.username);
-        this.loggedIn$.next(true);
-      })
-    );
+    return this.http
+      .post<AuthResponse>(`${environment.api.baseUrl}/auth/login`, { username, password })
+      .pipe(
+        tap((res) => {
+          localStorage.setItem(this.TOKEN_KEY, res.token);
+          localStorage.setItem(this.USER_KEY, res.username);
+          this.loggedIn$.next(true);
+        }),
+      );
   }
 
   logout(): void {
@@ -30,22 +35,39 @@ export class AuthService {
     this.router.navigate(['/']);
   }
 
-  getToken(): string | null { return localStorage.getItem(this.TOKEN_KEY); }
-  getUsername(): string { return localStorage.getItem(this.USER_KEY) || 'admin'; }
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+  getUsername(): string {
+    return localStorage.getItem(this.USER_KEY) || 'admin';
+  }
 
-  isLoggedIn(): Observable<boolean> { return this.loggedIn$.asObservable(); }
-  isLoggedInSnapshot(): boolean { return this.loggedIn$.value; }
+  isLoggedIn(): Observable<boolean> {
+    return this.loggedIn$.asObservable();
+  }
+  isLoggedInSnapshot(): boolean {
+    return this.loggedIn$.value;
+  }
 
-  changePassword(currentPassword: string, newPassword: string, newUsername?: string): Observable<AuthResponse> {
-    return this.http.put<AuthResponse>(`${environment.api.baseUrl}/auth/change-password`,
-      { currentPassword, newPassword, newUsername }).pipe(
-      tap(res => {
-        if (res.token) {
-          localStorage.setItem(this.TOKEN_KEY, res.token);
-          localStorage.setItem(this.USER_KEY, res.username);
-        }
+  changePassword(
+    currentPassword: string,
+    newPassword: string,
+    newUsername?: string,
+  ): Observable<AuthResponse> {
+    return this.http
+      .put<AuthResponse>(`${environment.api.baseUrl}/auth/change-password`, {
+        currentPassword,
+        newPassword,
+        newUsername,
       })
-    );
+      .pipe(
+        tap((res) => {
+          if (res.token) {
+            localStorage.setItem(this.TOKEN_KEY, res.token);
+            localStorage.setItem(this.USER_KEY, res.username);
+          }
+        }),
+      );
   }
 
   forgotPassword(): Observable<any> {
@@ -62,6 +84,8 @@ export class AuthService {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.exp * 1000 > Date.now();
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   }
 }

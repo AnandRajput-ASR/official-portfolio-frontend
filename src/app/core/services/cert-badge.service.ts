@@ -1,32 +1,41 @@
 import { Injectable } from '@angular/core';
 
 export interface BadgeConfig {
-  svg: string;      // inline SVG markup
-  bg: string;       // background color
+  svg: string; // inline SVG markup
+  bg: string; // background color
   textColor: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CertBadgeService {
-
   /** Returns true if this issuer has auto-generated badge support */
   isKnownIssuer(issuer: string): boolean {
-    const known = ['microsoft', 'aws', 'amazon', 'google', 'comptia', 'oracle', 'cisco', 'pmi', 'meta'];
+    const known = [
+      'microsoft',
+      'aws',
+      'amazon',
+      'google',
+      'comptia',
+      'oracle',
+      'cisco',
+      'pmi',
+      'meta',
+    ];
     return known.includes((issuer || '').toLowerCase().trim());
   }
 
   /** Get brand color for issuer */
   getIssuerColor(issuer: string): string {
     const colors: Record<string, string> = {
-      'microsoft': '#0078d4',
-      'aws': '#ff9900',
-      'amazon': '#ff9900',
-      'google': '#4285f4',
-      'comptia': '#c8102e',
-      'oracle': '#f80000',
-      'cisco': '#1ba0d7',
-      'pmi': '#003087',
-      'meta': '#0668e1',
+      microsoft: '#0078d4',
+      aws: '#ff9900',
+      amazon: '#ff9900',
+      google: '#4285f4',
+      comptia: '#c8102e',
+      oracle: '#f80000',
+      cisco: '#1ba0d7',
+      pmi: '#003087',
+      meta: '#0668e1',
     };
     return colors[(issuer || '').toLowerCase()] || '#f5a623';
   }
@@ -75,7 +84,7 @@ export class CertBadgeService {
   /** Level badge color */
   getLevelColor(level: string): string {
     const lvl = (level || '').toLowerCase();
-    if (lvl.includes('expert') || lvl.includes('professional'))  return '#f5a623';
+    if (lvl.includes('expert') || lvl.includes('professional')) return '#f5a623';
     if (lvl.includes('associate') || lvl.includes('practitioner')) return '#0078d4';
     if (lvl.includes('fundamental') || lvl.includes('foundational')) return '#68a063';
     return '#7a7570';
@@ -83,11 +92,11 @@ export class CertBadgeService {
 
   getLevelLabel(level: string): string {
     const lvl = (level || '').toLowerCase();
-    if (lvl.includes('expert'))       return 'Expert ★';
+    if (lvl.includes('expert')) return 'Expert ★';
     if (lvl.includes('professional')) return 'Professional';
-    if (lvl.includes('associate'))    return 'Associate';
+    if (lvl.includes('associate')) return 'Associate';
     if (lvl.includes('practitioner')) return 'Practitioner';
-    if (lvl.includes('fundamental'))  return 'Fundamental';
+    if (lvl.includes('fundamental')) return 'Fundamental';
     if (lvl.includes('foundational')) return 'Foundational';
     return level;
   }

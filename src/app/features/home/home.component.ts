@@ -1,4 +1,12 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ElementRef,
+  ViewChildren,
+  QueryList,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -14,7 +22,7 @@ import { PortfolioContent } from '../../core/models/portfolio.model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   content: PortfolioContent | null = null;
@@ -50,7 +58,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     public resumeService: ResumeService,
     public themeService: ThemeService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
   ) {}
 
   ngOnInit(): void {
@@ -68,11 +76,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.apiError = true;
         this.loadingService.stop('home-content');
-      }
+      },
     });
     this.resumeService.getInfo().subscribe({
-      next: (info) => this.resumeInfo = info,
-      error: () => {}
+      next: (info) => (this.resumeInfo = info),
+      error: () => {},
     });
   }
 
@@ -88,17 +96,22 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     // Track contact section view
     const contactEl = document.getElementById('contact');
     if (contactEl) {
-      const io = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          this.contentService.trackEvent('contactView');
-          io.disconnect();
-        }
-      }, { threshold: 0.3 });
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            this.contentService.trackEvent('contactView');
+            io.disconnect();
+          }
+        },
+        { threshold: 0.3 },
+      );
       io.observe(contactEl);
     }
   }
 
-  dismissOtw(): void { this.otwDismissed = true; }
+  dismissOtw(): void {
+    this.otwDismissed = true;
+  }
 
   navigateToBlog(slug: string): void {
     this.router.navigate(['/blog', slug]);
@@ -106,30 +119,42 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   submitPublicTestimonial(): void {
     if (!this.testiSubmitForm.name || !this.testiSubmitForm.quote) {
-      this.testiSubmitError = 'Name and your testimonial are required.'; return;
+      this.testiSubmitError = 'Name and your testimonial are required.';
+      return;
     }
-    this.testiSubmitting = true; this.testiSubmitError = '';
+    this.testiSubmitting = true;
+    this.testiSubmitError = '';
     this.contentService.submitTestimonial(this.testiSubmitForm).subscribe({
       next: () => {
-        this.testiSubmitting = false; this.testiSubmitSuccess = true;
+        this.testiSubmitting = false;
+        this.testiSubmitSuccess = true;
         this.testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
-        setTimeout(() => { this.testiSubmitSuccess = false; this.showTestiSubmitForm = false; }, 5000);
+        setTimeout(() => {
+          this.testiSubmitSuccess = false;
+          this.showTestiSubmitForm = false;
+        }, 5000);
       },
       error: (err) => {
         this.testiSubmitting = false;
         this.testiSubmitError = err.error?.message || 'Submission failed. Please try again.';
-      }
+      },
     });
   }
 
-  toggleMobileMenu(): void { this.mobileMenuOpen = !this.mobileMenuOpen; }
-  closeMobileMenu(): void  { this.mobileMenuOpen = false; }
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
 
   toggleCompany(id: string): void {
     if (this.openCompanies.has(id)) this.openCompanies.delete(id);
     else this.openCompanies.add(id);
   }
-  isCompanyOpen(id: string): boolean { return this.openCompanies.has(id); }
+  isCompanyOpen(id: string): boolean {
+    return this.openCompanies.has(id);
+  }
 
   trackProjectClick(projectId: string): void {
     this.contentService.trackEvent('projectClick', projectId);
@@ -146,82 +171,111 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private _visibleTestis: any[] = [];
   private _publishedPosts: any[] = [];
 
-  visibleTestimonials() { return this._visibleTestis; }
-  publishedPosts()      { return this._publishedPosts; }
+  visibleTestimonials() {
+    return this._visibleTestis;
+  }
+  publishedPosts() {
+    return this._publishedPosts;
+  }
 
   private refreshCaches(): void {
-    this._visibleTestis  = (this.content?.testimonials || []).filter(t => t.visible);
-    this._publishedPosts = (this.content?.blogPosts    || []).filter(p => p.published);
+    this._visibleTestis = (this.content?.testimonials || []).filter((t) => t.visible);
+    this._publishedPosts = (this.content?.blogPosts || []).filter((p) => p.published);
   }
 
   tickerItems(): string[] {
-    return this.content?.siteSettings?.ticker?.items || [
-      'Angular','TypeScript','Azure DevOps','Node.js','AWS Lambda',
-      'RxJS','NgRx','PostgreSQL','Cosmos DB','AZ-400 Expert','CI/CD Pipelines'
-    ];
+    return (
+      this.content?.siteSettings?.ticker?.items || [
+        'Angular',
+        'TypeScript',
+        'Azure DevOps',
+        'Node.js',
+        'AWS Lambda',
+        'RxJS',
+        'NgRx',
+        'PostgreSQL',
+        'Cosmos DB',
+        'AZ-400 Expert',
+        'CI/CD Pipelines',
+      ]
+    );
   }
 
-  stars(n: number): number[] { return Array(n).fill(0); }
+  stars(n: number): number[] {
+    return Array(n).fill(0);
+  }
 
   private setupScrollReveal(): void {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add('visible');
-            // Animate skill proficiency bar
-            const bar = entry.target.querySelector('.sk-prof-fill') as HTMLElement;
-            if (bar) setTimeout(() => bar.style.width = bar.dataset['width'] || '80%', 200);
-          }, i * 80);
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+              // Animate skill proficiency bar
+              const bar = entry.target.querySelector('.sk-prof-fill') as HTMLElement;
+              if (bar) setTimeout(() => (bar.style.width = bar.dataset['width'] || '80%'), 200);
+            }, i * 80);
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
     setTimeout(() => {
-      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
     }, 100);
   }
 
   private setupCounters(): void {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target as HTMLElement;
-          const target = +(el.dataset['target'] || 0);
-          const suffix = el.dataset['suffix'] || '';
-          let current = 0;
-          const inc = target / 40;
-          const timer = setInterval(() => {
-            current += inc;
-            if (current >= target) { current = target; clearInterval(timer); }
-            el.textContent = Math.floor(current) + suffix;
-          }, 40);
-          io.unobserve(el);
-        }
-      });
-    }, { threshold: 0.5 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const target = +(el.dataset['target'] || 0);
+            const suffix = el.dataset['suffix'] || '';
+            let current = 0;
+            const inc = target / 40;
+            const timer = setInterval(() => {
+              current += inc;
+              if (current >= target) {
+                current = target;
+                clearInterval(timer);
+              }
+              el.textContent = Math.floor(current) + suffix;
+            }, 40);
+            io.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
     setTimeout(() => {
-      document.querySelectorAll('.stat-num[data-target]').forEach(el => io.observe(el));
+      document.querySelectorAll('.stat-num[data-target]').forEach((el) => io.observe(el));
     }, 100);
   }
 
   sendMessage(): void {
     const { name, email, message } = this.contactForm;
     if (!name || !email || !message) {
-      this.contactError = 'Please fill in all fields.'; return;
+      this.contactError = 'Please fill in all fields.';
+      return;
     }
-    this.contactSending = true; this.contactError = '';
+    this.contactSending = true;
+    this.contactError = '';
     this.messagesService.sendMessage(this.contactForm).subscribe({
       next: () => {
-        this.contactSending = false; this.contactSuccess = true;
+        this.contactSending = false;
+        this.contactSuccess = true;
         this.contactForm = { name: '', email: '', message: '' };
         this.contentService.trackEvent('contactSubmit');
-        setTimeout(() => this.contactSuccess = false, 6000);
+        setTimeout(() => (this.contactSuccess = false), 6000);
       },
       error: (err) => {
         this.contactSending = false;
         this.contactError = err.error?.message || 'Failed to send. Please try again.';
-      }
+      },
     });
   }
 
@@ -242,15 +296,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.apiError = true;
         this.loadingService.stop('home-content');
-      }
+      },
     });
   }
 
   ngOnDestroy(): void {
     this.destroyed = true;
     if (this.scrollHandler) window.removeEventListener('scroll', this.scrollHandler);
-    this.observers.forEach(io => io.disconnect());
+    this.observers.forEach((io) => io.disconnect());
   }
 
-  trackById(_: number, item: { id: string }): string { return item.id; }
+  trackById(_: number, item: { id: string }): string {
+    return item.id;
+  }
 }
