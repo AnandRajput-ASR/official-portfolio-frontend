@@ -12,16 +12,33 @@ import { CommonModule } from '@angular/common';
       <span *ngIf="loading" class="lb-text">{{ loadingLabel || label }}</span>
     </button>
   `,
-  styles: [`
-    .lb-spinner {
-      display: inline-block; width: 12px; height: 12px; border-radius: 50%;
-      border: 2px solid currentColor; border-top-color: transparent;
-      animation: lb-spin .7s linear infinite; flex-shrink: 0;
-    }
-    .lb-text { opacity: .7; }
-    .btn { display: inline-flex; align-items: center; gap: .5rem; }
-    @keyframes lb-spin { to { transform: rotate(360deg); } }
-  `]
+  styles: [
+    `
+      .lb-spinner {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        animation: lb-spin 0.7s linear infinite;
+        flex-shrink: 0;
+      }
+      .lb-text {
+        opacity: 0.7;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      @keyframes lb-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    `,
+  ],
 })
 export class LoadingBtnComponent {
   @Input() label = 'Save';

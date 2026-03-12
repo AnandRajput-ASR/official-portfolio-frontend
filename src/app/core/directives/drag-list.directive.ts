@@ -1,6 +1,11 @@
 import {
-  Directive, Input, Output, EventEmitter,
-  HostListener, ElementRef, Renderer2
+  Directive,
+  Input,
+  Output,
+  EventEmitter,
+  HostListener,
+  ElementRef,
+  Renderer2,
 } from '@angular/core';
 
 /**
@@ -17,7 +22,10 @@ export class DragListDirective {
 
   private dragSrcId: string | null = null;
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2,
+  ) {}
 
   private getItems(): HTMLElement[] {
     return Array.from(this.el.nativeElement.querySelectorAll('[data-drag-id]'));
@@ -34,7 +42,7 @@ export class DragListDirective {
 
   @HostListener('dragend', ['$event'])
   onDragEnd(e: DragEvent) {
-    this.getItems().forEach(el => {
+    this.getItems().forEach((el) => {
       this.renderer.removeClass(el, 'dragging');
       this.renderer.removeClass(el, 'drag-over');
     });
@@ -45,7 +53,7 @@ export class DragListDirective {
     e.preventDefault();
     e.dataTransfer!.dropEffect = 'move';
     const target = (e.target as HTMLElement).closest('[data-drag-id]') as HTMLElement;
-    this.getItems().forEach(el => this.renderer.removeClass(el, 'drag-over'));
+    this.getItems().forEach((el) => this.renderer.removeClass(el, 'drag-over'));
     if (target && target.dataset['dragId'] !== this.dragSrcId) {
       this.renderer.addClass(target, 'drag-over');
     }
@@ -68,7 +76,7 @@ export class DragListDirective {
 
     // Reorder the actual DOM items to get new sequence
     const items = this.getItems();
-    const ids = items.map(el => el.dataset['dragId'] as string);
+    const ids = items.map((el) => el.dataset['dragId'] as string);
     const srcIdx = ids.indexOf(this.dragSrcId);
     const dstIdx = ids.indexOf(destId!);
     if (srcIdx < 0 || dstIdx < 0) return;
@@ -78,6 +86,6 @@ export class DragListDirective {
 
     this.reordered.emit(ids);
     this.dragSrcId = null;
-    this.getItems().forEach(el => this.renderer.removeClass(el, 'drag-over'));
+    this.getItems().forEach((el) => this.renderer.removeClass(el, 'drag-over'));
   }
 }

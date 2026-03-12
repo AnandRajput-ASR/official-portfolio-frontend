@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   username = '';
@@ -17,7 +17,10 @@ export class LoginComponent {
   error = '';
   loading = false;
 
-  constructor(private auth: AuthService, private router: Router) {
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+  ) {
     if (this.auth.isLoggedInSnapshot()) {
       this.router.navigate(['/admin/dashboard']);
     }
@@ -35,7 +38,7 @@ export class LoginComponent {
       error: (err) => {
         this.loading = false;
         this.error = err.error?.message || 'Invalid credentials';
-      }
+      },
     });
   }
 }

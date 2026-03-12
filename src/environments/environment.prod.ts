@@ -2,10 +2,10 @@ export const environment = {
   production: true,
 
   api: {
-    baseUrl: '/api'
+    baseUrl: '/api',
   },
 
   assets: {
-    baseUrl: '/assets'
-  }
+    baseUrl: '/assets',
+  },
 };

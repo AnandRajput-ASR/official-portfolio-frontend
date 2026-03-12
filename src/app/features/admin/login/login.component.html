@@ -20,7 +20,8 @@
           name="username"
           placeholder="admin"
           [disabled]="loading"
-          autocomplete="username">
+          autocomplete="username"
+        />
       </div>
 
       <div class="form-group">
@@ -31,12 +32,11 @@
           name="password"
           placeholder="••••••••"
           [disabled]="loading"
-          autocomplete="current-password">
+          autocomplete="current-password"
+        />
       </div>
 
-      <div class="error-msg" *ngIf="error">
-        <span>⚠</span> {{ error }}
-      </div>
+      <div class="error-msg" *ngIf="error"><span>⚠</span> {{ error }}</div>
 
       <button type="submit" class="btn btn-primary" [disabled]="loading">
         <span *ngIf="!loading">Login →</span>
