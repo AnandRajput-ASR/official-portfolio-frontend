@@ -18,7 +18,7 @@ export interface Skill {
   tags: string[];
   proficiency: number;
   yearsExp: string;
-  order: number;
+  displayOrder: number;
 }
 export interface CompanyProject {
   id: string;
@@ -27,7 +27,7 @@ export interface CompanyProject {
   description: string;
   tech: string[];
   link: string;
-  order: number;
+  displayOrder: number;
 }
 export interface Company {
   id: string;
@@ -40,7 +40,7 @@ export interface Company {
   current: boolean;
   description: string;
   projects: CompanyProject[];
-  order: number;
+  displayOrder: number;
 }
 export interface PersonalProject {
   id: string;
@@ -53,7 +53,7 @@ export interface PersonalProject {
   type: 'personal' | 'freelance' | 'opensource';
   featured: boolean;
   year: string;
-  order: number;
+  displayOrder: number;
 }
 export interface Experience {
   id: string;
@@ -62,7 +62,7 @@ export interface Experience {
   company: string;
   location: string;
   description: string;
-  order: number;
+  displayOrder: number;
 }
 export interface Stat {
   id: string;
@@ -81,7 +81,7 @@ export interface Certification {
   badgeType: 'auto' | 'upload' | 'default';
   accentColor: string;
   year: string;
-  order: number;
+  displayOrder: number;
 }
 export interface Testimonial {
   id: string;
@@ -92,7 +92,7 @@ export interface Testimonial {
   quote: string;
   rating: number;
   visible: boolean;
-  order: number;
+  displayOrder: number;
   status: 'approved' | 'pending' | 'rejected';
   submittedAt?: string;
 }
@@ -107,7 +107,7 @@ export interface BlogPost {
   published: boolean;
   publishedAt: string;
   readingTime: number;
-  order: number;
+  displayOrder: number;
 }
 export interface FreelanceConfig {
   enabled: boolean;
