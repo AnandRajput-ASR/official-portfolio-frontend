@@ -38,50 +38,21 @@ export class ContentService {
   }
 
   getAll(): Observable<PortfolioContent> {
-    return this.http.get<PortfolioContent>(this.base);
+    return this.http.get<PortfolioContent>(this.base + '/page-content');
   }
   updateHero(hero: Hero): Observable<any> {
     return this.http.put(this.base + '/hero', hero);
   }
 
-  // Skills
-  updateSkills(s: Skill[]): Observable<any> {
-    return this.http.put(this.base + '/skills', s);
-  }
-  addSkill(s: Skill): Observable<any> {
-    return this.http.post(this.base + '/skills', s);
-  }
-  deleteSkill(id: string): Observable<any> {
-    return this.http.delete(this.base + '/skills/' + id);
-  }
-
   // Companies
-  updateCompanies(c: Company[]): Observable<any> {
-    return this.http.put(this.base + '/companies', c);
-  }
-  addCompany(c: Partial<Company>): Observable<any> {
-    return this.http.post(this.base + '/companies', c);
-  }
-  deleteCompany(id: string): Observable<any> {
-    return this.http.delete(this.base + '/companies/' + id);
-  }
-  addCompanyProject(coId: string, p: Partial<CompanyProject>): Observable<any> {
-    return this.http.post(`${this.base}/companies/${coId}/projects`, p);
-  }
-  deleteCompanyProject(coId: string, pid: string): Observable<any> {
-    return this.http.delete(`${this.base}/companies/${coId}/projects/${pid}`);
-  }
+
+
+
+
+
 
   // Personal Projects
-  updatePersonalProjects(p: PersonalProject[]): Observable<any> {
-    return this.http.put(this.base + '/personal-projects', p);
-  }
-  addPersonalProject(p: Partial<PersonalProject>): Observable<any> {
-    return this.http.post(this.base + '/personal-projects', p);
-  }
-  deletePersonalProject(id: string): Observable<any> {
-    return this.http.delete(this.base + '/personal-projects/' + id);
-  }
+  
 
   // Experience
   updateExperience(e: Experience[]): Observable<any> {
@@ -182,7 +153,7 @@ export class ContentService {
   }
 
   // Reorder
-  reorder(section: string, items: { id: string; order: number }[]): Observable<any> {
+  reorder(section: string, items: { id: string; displayOrder: number }[]): Observable<any> {
     return this.http.put(this.base + '/reorder/' + section, items);
   }
 }

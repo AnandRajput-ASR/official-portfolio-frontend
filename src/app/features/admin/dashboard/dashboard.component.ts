@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ContentService } from '../../../core/services/content.service';
+import { AdminService } from '../../../core/services/admin.service';
 import { CertBadgeService } from '../../../core/services/cert-badge.service';
 import { DragListDirective } from '../../../core/directives/drag-list.directive';
 import { AuthService } from '../../../core/services/auth.service';
@@ -137,6 +138,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private contentService: ContentService,
+    private adminService: AdminService,
     public auth: AuthService,
     private messagesService: MessagesService,
     public resumeService: ResumeService,
@@ -400,7 +402,9 @@ export class DashboardComponent implements OnInit {
   // ── HERO ──────────────────────────────────────────────────────────────────
   saveHero(): void {
     this.saving = true;
-    this.contentService.updateHero(this.heroEdit).subscribe({
+    const payload = {...this.heroEdit, updated_at: Date.now()}
+    console.table(payload)
+    this.adminService.updateHeroSection(payload).subscribe({
       next: (res) => {
         this.content!.hero = res.hero;
         this.saving = false;
@@ -417,7 +421,7 @@ export class DashboardComponent implements OnInit {
   // ── SKILLS ────────────────────────────────────────────────────────────────
   saveSkills(): void {
     this.saving = true;
-    this.contentService.updateSkills(this.skillsEdit).subscribe({
+    this.adminService.updateSkills(this.skillsEdit).subscribe({
       next: () => {
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
         this.saving = false;
@@ -452,10 +456,12 @@ export class DashboardComponent implements OnInit {
     });
     if (!ok) return;
     this.skillsEdit = this.skillsEdit.filter((s) => s.id !== id);
-    this.contentService.updateSkills(this.skillsEdit).subscribe({
+    console.table(this.skillsEdit)
+    this.adminService.deleteSkill(id).subscribe({
       next: () => {
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
-        this.toast.success('Skill deleted');
+        this.toast.success('Skill deleted')
+        return
       },
       error: () => this.toast.error('Delete failed'),
     });
@@ -470,9 +476,9 @@ export class DashboardComponent implements OnInit {
       tags: this.newSkill.tags || [],
       proficiency: this.newSkill.proficiency || 80,
       yearsExp: this.newSkill.yearsExp || '1+',
-      order: this.skillsEdit.length,
+      displayOrder: this.skillsEdit.length,
     };
-    this.contentService.addSkill(skill).subscribe({
+    this.adminService.addSkill(skill).subscribe({
       next: () => {
         this.skillsEdit.push(skill);
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
@@ -490,7 +496,7 @@ export class DashboardComponent implements OnInit {
   }
   saveCompanies(): void {
     this.saving = true;
-    this.contentService.updateCompanies(this.companiesEdit).subscribe({
+    this.adminService.updateCompanies(this.companiesEdit).subscribe({
       next: () => {
         this.content!.companies = JSON.parse(JSON.stringify(this.companiesEdit));
         this.saving = false;
@@ -504,9 +510,9 @@ export class DashboardComponent implements OnInit {
     });
   }
   submitAddCompany(): void {
-    this.contentService.addCompany(this.newCompany).subscribe({
+    this.adminService.addCompany(this.newCompany).subscribe({
       next: (res) => {
-        this.companiesEdit.push(res.company);
+        this.companiesEdit.push(res.data);
         this.content!.companies = JSON.parse(JSON.stringify(this.companiesEdit));
         this.showAddCompany = false;
         this.newCompany = this.emptyCompany();
@@ -525,7 +531,7 @@ export class DashboardComponent implements OnInit {
       icon: '⚠️',
     });
     if (!ok) return;
-    this.contentService.deleteCompany(id).subscribe({
+    this.adminService.deleteCompany(id).subscribe({
       next: () => {
         this.companiesEdit = this.companiesEdit.filter((c) => c.id !== id);
         this.content!.companies = JSON.parse(JSON.stringify(this.companiesEdit));
@@ -535,10 +541,10 @@ export class DashboardComponent implements OnInit {
     });
   }
   submitAddCompanyProject(companyId: string): void {
-    this.contentService.addCompanyProject(companyId, this.newCompanyProject).subscribe({
+    this.adminService.addCompanyProject(companyId, this.newCompanyProject).subscribe({
       next: (res) => {
         const co = this.companiesEdit.find((c) => c.id === companyId);
-        if (co) co.projects.push(res.project);
+        if (co) co.projects.push(res.data);
         this.content!.companies = JSON.parse(JSON.stringify(this.companiesEdit));
         this.showAddCompanyProject = null;
         this.newCompanyProject = this.emptyCompanyProject();
@@ -556,7 +562,7 @@ export class DashboardComponent implements OnInit {
       icon: '🗑️',
     });
     if (!ok) return;
-    this.contentService.deleteCompanyProject(companyId, projectId).subscribe({
+    this.adminService.deleteCompanyProject(projectId).subscribe({
       next: () => {
         const co = this.companiesEdit.find((c) => c.id === companyId);
         if (co) co.projects = co.projects.filter((p) => p.id !== projectId);
@@ -580,7 +586,7 @@ export class DashboardComponent implements OnInit {
   // ── PERSONAL PROJECTS ────────────────────────────────────────────────────
   savePersonalProjects(): void {
     this.saving = true;
-    this.contentService.updatePersonalProjects(this.personalProjectsEdit).subscribe({
+    this.adminService.updatePersonalProjects(this.personalProjectsEdit).subscribe({
       next: () => {
         this.content!.personalProjects = JSON.parse(JSON.stringify(this.personalProjectsEdit));
         this.saving = false;
@@ -605,11 +611,11 @@ export class DashboardComponent implements OnInit {
       type: (this.newPersonal.type as any) || 'personal',
       featured: this.newPersonal.featured || false,
       year: this.newPersonal.year || String(new Date().getFullYear()),
-      order: this.personalProjectsEdit.length,
+      displayOrder: this.personalProjectsEdit.length,
     };
-    this.contentService.addPersonalProject(project).subscribe({
-      next: () => {
-        this.personalProjectsEdit.push(project);
+    this.adminService.addPersonalProject(project).subscribe({
+      next: (res) => {
+        this.personalProjectsEdit.push(res.data);
         this.content!.personalProjects = JSON.parse(JSON.stringify(this.personalProjectsEdit));
         this.showAddPersonal = false;
         this.newPersonal = this.emptyPersonal();
@@ -627,7 +633,7 @@ export class DashboardComponent implements OnInit {
       icon: '🗑️',
     });
     if (!ok) return;
-    this.contentService.deletePersonalProject(id).subscribe({
+    this.adminService.deletePersonalProject(id).subscribe({
       next: () => {
         this.personalProjectsEdit = this.personalProjectsEdit.filter((p) => p.id !== id);
         this.content!.personalProjects = JSON.parse(JSON.stringify(this.personalProjectsEdit));
@@ -690,7 +696,7 @@ export class DashboardComponent implements OnInit {
       company: this.newExp.company || '',
       location: this.newExp.location || '',
       description: this.newExp.description || '',
-      order: this.experienceEdit.length,
+      displayOrder: this.experienceEdit.length,
     };
     this.contentService.addExperience(exp).subscribe({
       next: () => {
@@ -885,7 +891,7 @@ export class DashboardComponent implements OnInit {
       badgeType: (this.newCert.badgeType || 'auto') as any,
       accentColor: this.newCert.accentColor || '#0078d4',
       year: this.newCert.year || String(new Date().getFullYear()),
-      order: this.certificationsEdit.length,
+      displayOrder: this.certificationsEdit.length,
     };
     this.contentService.addCertification(cert).subscribe({
       next: () => {
@@ -1003,7 +1009,7 @@ export class DashboardComponent implements OnInit {
       quote: this.newTestimonial.quote || '',
       rating: this.newTestimonial.rating || 5,
       visible: true,
-      order: this.testimonialsEdit.length,
+      displayOrder: this.testimonialsEdit.length,
       status: 'approved',
     };
     this.contentService.addTestimonial(t).subscribe({
@@ -1128,7 +1134,7 @@ export class DashboardComponent implements OnInit {
       published: this.newBlog.published || false,
       publishedAt: this.newBlog.publishedAt || new Date().toISOString().split('T')[0],
       readingTime: this.newBlog.readingTime || 5,
-      order: this.blogEdit.length,
+      displayOrder: this.blogEdit.length,
     };
     this.contentService.addBlogPost(post).subscribe({
       next: (res) => {
@@ -1473,11 +1479,11 @@ export class DashboardComponent implements OnInit {
 
   // ── DRAG REORDER ─────────────────────────────────────────────────────────
   onReorder(section: string, newIds: string[]): void {
-    const orderPayload = newIds.map((id, idx) => ({ id, order: idx }));
+    const orderPayload = newIds.map((id, idx) => ({ id, displayOrder: idx }));
     const reorder = (arr: any[]) => {
       const map: Record<string, number> = {};
-      orderPayload.forEach((o) => (map[o.id] = o.order));
-      return [...arr].sort((a, b) => (map[a.id] ?? a.order) - (map[b.id] ?? b.order));
+      orderPayload.forEach((o) => (map[o.id] = o.displayOrder));
+      return [...arr].sort((a, b) => (map[a.id] ?? a.displayOrder) - (map[b.id] ?? b.displayOrder));
     };
     if (section === 'skills') this.skillsEdit = reorder(this.skillsEdit);
     else if (section === 'companies') this.companiesEdit = reorder(this.companiesEdit);
@@ -1495,7 +1501,7 @@ export class DashboardComponent implements OnInit {
     this.contentService
       .reorder(section, orderPayload)
       .subscribe({
-        next: () => this.toast.success('Order saved'),
+        next: () => this.toast.success('displayOrder saved'),
         error: () => this.toast.error('Reorder failed'),
       });
   }
