@@ -68,6 +68,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.content = data;
         this.loading = false;
         this.refreshCaches();
+        // run reveal AFTER DOM renders
+        setTimeout(() => {
+          this.setupScrollReveal();
+          this.setupCounters();
+        }, 0);
+
         this.loadingService.stop('home-content');
         // Track page view
         this.contentService.trackEvent('pageView');
@@ -85,8 +91,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.setupScrollReveal();
-    this.setupCounters();
+    // this.setupScrollReveal();
+    // this.setupCounters();
     this.scrollHandler = () => {
       if (this.destroyed) return;
       const nav = document.getElementById('mainNav');
@@ -210,14 +216,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private setupScrollReveal(): void {
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, i) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setTimeout(() => {
               entry.target.classList.add('visible');
               // Animate skill proficiency bar
               const bar = entry.target.querySelector('.sk-prof-fill') as HTMLElement;
               if (bar) setTimeout(() => (bar.style.width = bar.dataset['width'] || '80%'), 200);
-            }, i * 80);
+            }, 80);
             io.unobserve(entry.target);
           }
         });
@@ -291,6 +297,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.apiError = false;
         this.refreshCaches();
+        // run reveal AFTER DOM renders
+        setTimeout(() => {
+          this.setupScrollReveal();
+          this.setupCounters();
+        }, 0);
+
         this.loadingService.stop('home-content');
         this.contentService.trackEvent('pageView');
       },
