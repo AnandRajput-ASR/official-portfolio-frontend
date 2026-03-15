@@ -26,11 +26,7 @@
       <a href="#skills">Skills</a>
       <a href="#projects">Work</a>
       <a href="#personal-projects">Side Projects</a>
-      <a
-        href="#blog"
-        *ngIf="content.siteSettings?.sections?.blog !== false && publishedPosts().length > 0"
-        >Writing</a
-      >
+      <a href="#certs">Certifications</a>
       <a
         href="#testimonials"
         *ngIf="
@@ -38,7 +34,11 @@
         "
         >Reviews</a
       >
-      <a href="#certs">Certifications</a>
+      <a
+        href="#blog"
+        *ngIf="content.siteSettings?.sections?.blog !== false && publishedPosts().length > 0"
+        >Writing</a
+      >
       <a href="#contact">Hire Me</a>
     </div>
 
@@ -119,16 +119,20 @@
           <span class="badge-dot"></span>
           {{ content.siteSettings?.hero?.badgeText || 'Available for Freelance · Pune, India' }}
         </div>
+        <!-- Heading Name -->
         <h1 class="hero-name anim-2">
           {{ content.hero.name.split(' ')[0] }}<br /><span class="name-accent">{{
             content.hero.name.split(' ').slice(1).join(' ')
           }}</span>
         </h1>
+        <!-- Role / Designation -->
         <div class="hero-role anim-3">
           <span class="role-line"></span>
           {{ content.hero.title }}
         </div>
+        <!-- Bio from Hero Section -->
         <p class="hero-bio anim-4">{{ content.hero.bio }}</p>
+        <!-- Technology List -->
         <div class="hero-pills anim-5">
           <span class="pill" *ngFor="let pill of content.siteSettings?.hero?.pills">{{
             pill

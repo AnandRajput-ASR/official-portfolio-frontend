@@ -179,8 +179,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private refreshCaches(): void {
-    this._visibleTestis = (this.content?.testimonials || []).filter((t) => t.visible);
-    this._publishedPosts = (this.content?.blogPosts || []).filter((p) => p.published);
+    this._visibleTestis = this.content?.testimonials || [];
+    // this._visibleTestis = (this.content?.testimonials || []).filter((t) => t.visible); //exsiting
+    this._publishedPosts = this.content?.blogPosts || [];
+    // this._publishedPosts = (this.content?.blogPosts || []).filter((p) => p.published); exsiting
   }
 
   tickerItems(): string[] {
