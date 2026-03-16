@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 import {
   Analytics,
   BlogPost,
@@ -17,17 +16,14 @@ import {
   Skill,
   Stat,
   Testimonial,
-} from '../models/portfolio.model';
+} from '@core/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private base = environment.api.baseUrl + '/admin';
-  constructor(
-    private http: HttpClient,
-    private sanitizer: DomSanitizer,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   getAll(): Observable<PortfolioContent> {
     return this.http.get<PortfolioContent>(this.base + '/page-content');
@@ -46,7 +42,6 @@ export class AdminService {
   }
 
   deleteSkill(id: string): Observable<any> {
-    console.log('Deleting skill with id:', id);
     return this.http.delete(this.base + '/skills/' + id);
   }
 

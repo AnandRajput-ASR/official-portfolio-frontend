@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoadingService } from '../../../core/services/loading.service';
+import { LoadingService } from '@core/services/loading.service';
 
 /**
  * Full-screen loading overlay driven by LoadingService.

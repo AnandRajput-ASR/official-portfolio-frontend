@@ -2,20 +2,20 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ContentService } from '../../../core/services/content.service';
-import { AdminService } from '../../../core/services/admin.service';
-import { CertBadgeService } from '../../../core/services/cert-badge.service';
-import { DragListDirective } from '../../../core/directives/drag-list.directive';
-import { AuthService } from '../../../core/services/auth.service';
-import { MessagesService } from '../../../core/services/messages.service';
-import { ResumeService, ResumeInfo, UploadProgress } from '../../../core/services/resume.service';
-import { ThemeService } from '../../../core/services/theme.service';
-import { ToastService } from '../../../shared/components/toast/toast.component';
-import { ToastComponent } from '../../../shared/components/toast/toast.component';
+import { ContentService } from '@core/services/content.service';
+import { AdminService } from '@core/services/admin.service';
+import { CertBadgeService } from '@core/services/cert-badge.service';
+import { DragListDirective } from '@core/directives/drag-list.directive';
+import { AuthService } from '@core/services/auth.service';
+import { MessagesService } from '@core/services/messages.service';
+import { ResumeService, ResumeInfo, UploadProgress } from '@core/services/resume.service';
+import { ThemeService } from '@core/services/theme.service';
+import { ToastService } from '@shared/components/toast/toast.component';
+import { ToastComponent } from '@shared/components/toast/toast.component';
 import {
   ConfirmDialogComponent,
   ConfirmConfig,
-} from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+} from '@shared/components/confirm-dialog/confirm-dialog.component';
 import {
   PortfolioContent,
   Hero,
@@ -30,8 +30,8 @@ import {
   BlogPost,
   SiteSettings,
   Analytics,
-  FreelanceConfig,
-} from '../../../core/models/portfolio.model';
+  Stat,
+} from '@core/models';
 
 type ActiveTab =
   | 'hero'
@@ -92,7 +92,6 @@ export class DashboardComponent implements OnInit {
   newCompany: Partial<Company> = this.emptyCompany();
   newCompanyProject: Partial<CompanyProject> = this.emptyCompanyProject();
   showAddPersonal = false;
-  editingPersonal: PersonalProject | null = null;
   newPersonal: Partial<PersonalProject> = this.emptyPersonal();
   showAddSkill = false;
   showAddExp = false;
@@ -131,7 +130,7 @@ export class DashboardComponent implements OnInit {
   showResetForm = false;
 
   // ── Stats editing ────────────────────────────────────────────────────────
-  statsEdit: any[] = [];
+  statsEdit: Stat[] = [];
 
   // ── Settings freelance services (editable list) ───────────────────────────
   newFreelanceService = '';
@@ -202,7 +201,6 @@ export class DashboardComponent implements OnInit {
         break;
       case 'certifications':
         this.certificationsEdit = JSON.parse(JSON.stringify(this.content.certifications || []));
-        console.log(this.certificationsEdit);
         break;
       case 'testimonials':
         this.testimonialsEdit = JSON.parse(JSON.stringify(this.content.testimonials || []));
@@ -287,7 +285,6 @@ export class DashboardComponent implements OnInit {
     this.personalProjectsEdit = JSON.parse(JSON.stringify(this.content.personalProjects || []));
     this.experienceEdit = JSON.parse(JSON.stringify(this.content.experience));
     this.certificationsEdit = JSON.parse(JSON.stringify(this.content.certifications || []));
-    console.log(this.certificationsEdit);
     this.testimonialsEdit = JSON.parse(JSON.stringify(this.content.testimonials || []));
     this.blogEdit = JSON.parse(JSON.stringify(this.content.blogPosts || []));
     // Deep merge with defaults so any missing nested keys are filled in
@@ -405,10 +402,9 @@ export class DashboardComponent implements OnInit {
   saveHero(): void {
     this.saving = true;
     const payload = { ...this.heroEdit, updated_at: Date.now() };
-    console.table(payload);
     this.adminService.updateHeroSection(payload).subscribe({
       next: (res) => {
-        this.content!.hero = res.hero;
+        this.content!.hero = res.data ?? this.heroEdit;
         this.saving = false;
         this.clearDirty();
         this.toast.success('Hero saved!');
@@ -458,12 +454,10 @@ export class DashboardComponent implements OnInit {
     });
     if (!ok) return;
     this.skillsEdit = this.skillsEdit.filter((s) => s.id !== id);
-    console.table(this.skillsEdit);
     this.adminService.deleteSkill(id).subscribe({
       next: () => {
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
         this.toast.success('Skill deleted');
-        return;
       },
       error: () => this.toast.error('Delete failed'),
     });
@@ -481,8 +475,8 @@ export class DashboardComponent implements OnInit {
       displayOrder: this.skillsEdit.length,
     };
     this.adminService.addSkill(skill).subscribe({
-      next: () => {
-        this.skillsEdit.push(skill);
+      next: (res) => {
+        this.skillsEdit.push(res.data || skill);
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
         this.showAddSkill = false;
         this.newSkill = this.emptySkill();
@@ -888,11 +882,12 @@ export class DashboardComponent implements OnInit {
       code: this.newCert.code || '',
       issuer: this.newCert.issuer || '',
       level: this.newCert.level || 'Associate',
-      credlyUrl: this.newCert.credlyUrl || '',
-      badgeUrl: this.certUploadPreview || this.newCert.badgeUrl || '',
+      credlyLink: this.newCert.credlyLink || '',
+      badgeLink: this.certUploadPreview || this.newCert.badgeLink || '',
       badgeType: (this.newCert.badgeType || 'auto') as any,
       accentColor: this.newCert.accentColor || '#0078d4',
-      year: this.newCert.year || String(new Date().getFullYear()),
+      issueYear: this.newCert.issueYear || String(new Date().getFullYear()),
+      expirationYear: '',
       displayOrder: this.certificationsEdit.length,
     };
     this.adminService.addCertification(cert).subscribe({
@@ -937,11 +932,11 @@ export class DashboardComponent implements OnInit {
       // Upload to server → store URL path instead of base64
       this.contentService.uploadImage(file.name, base64).subscribe({
         next: ({ url }) => {
-          cert.badgeUrl = url;
+          cert.badgeLink = url;
           if (cert === this.newCert) this.certUploadPreview = url;
         },
         error: () => {
-          cert.badgeUrl = dataUrl;
+          cert.badgeLink = dataUrl;
         }, // fallback to base64 if upload fails
       });
     };
@@ -949,13 +944,13 @@ export class DashboardComponent implements OnInit {
   }
   setBadgeType(cert: Partial<Certification>, type: 'auto' | 'upload' | 'default'): void {
     cert.badgeType = type;
-    if (type !== 'upload') cert.badgeUrl = '';
+    if (type !== 'upload') cert.badgeLink = '';
     const idx = this.certificationsEdit.findIndex((c) => c.id === cert.id);
     if (idx !== -1)
       this.certificationsEdit[idx] = {
         ...this.certificationsEdit[idx],
         badgeType: type,
-        badgeUrl: type !== 'upload' ? '' : cert.badgeUrl || '',
+        badgeLink: type !== 'upload' ? '' : cert.badgeLink || '',
       };
   }
   onIssuerChange(cert: Partial<Certification>): void {
@@ -1016,7 +1011,7 @@ export class DashboardComponent implements OnInit {
     };
     this.adminService.addTestimonial(t).subscribe({
       next: (res) => {
-        this.testimonialsEdit.push(res.testimonial || t);
+        this.testimonialsEdit.push(res.data || t);
         this.content!.testimonials = JSON.parse(JSON.stringify(this.testimonialsEdit));
         this.showAddTestimonial = false;
         this.newTestimonial = this.emptyTestimonial();
@@ -1048,7 +1043,7 @@ export class DashboardComponent implements OnInit {
     this.adminService.approveTestimonial(t.id).subscribe({
       next: (res) => {
         this.pendingTestimonials = this.pendingTestimonials.filter((p) => p.id !== t.id);
-        this.testimonialsEdit.push(res.testimonial || t);
+        this.testimonialsEdit.push(res.data || t);
         this.toast.success(`Approved! "${t.name}" is now visible.`);
       },
       error: () => this.toast.error('Approve failed'),
@@ -1195,22 +1190,23 @@ export class DashboardComponent implements OnInit {
     window.open('/blog/' + slug, '_blank');
   }
   addBlogTag(p: Partial<BlogPost>, e: Event): void {
+    if (!p.tags) p.tags = [];
     const v = (e.target as HTMLInputElement).value.trim();
-    if (v && !p.tags!.includes(v)) {
-      p.tags!.push(v);
+    if (v && !p.tags.includes(v)) {
+      p.tags.push(v);
       (e.target as HTMLInputElement).value = '';
     }
   }
   removeBlogTag(p: Partial<BlogPost>, t: string): void {
-    p.tags = p.tags!.filter((x) => x !== t);
+    p.tags = (p.tags || []).filter((x) => x !== t);
   }
 
   // ── ANALYTICS ────────────────────────────────────────────────────────────
   loadAnalytics(): void {
     this.analyticsLoading = true;
     this.adminService.getAnalytics().subscribe({
-      next: (res) => {
-        this.analytics = res; //BUG
+      next: (res: any) => {
+        this.analytics = res.data ?? res;
         this.analyticsLoading = false;
       },
       error: () => {
@@ -1527,11 +1523,11 @@ export class DashboardComponent implements OnInit {
       code: '',
       issuer: 'Microsoft',
       level: 'Associate',
-      credlyUrl: '',
-      badgeUrl: '',
+      credlyLink: '',
+      badgeLink: '',
       badgeType: 'auto',
       accentColor: '#0078d4',
-      year: String(new Date().getFullYear()),
+      issueYear: String(new Date().getFullYear()),
     };
   }
   emptyCompany(): Partial<Company> {

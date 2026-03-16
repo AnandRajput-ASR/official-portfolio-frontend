@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '@core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -34,7 +34,10 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
     this.auth.login(this.username, this.password).subscribe({
-      next: () => this.router.navigate(['/admin/dashboard']),
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/admin/dashboard']);
+      },
       error: (err) => {
         this.loading = false;
         this.error = err.error?.message || 'Invalid credentials';

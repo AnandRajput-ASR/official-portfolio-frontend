@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { GlobalLoaderComponent } from './shared/components/global-loader/global-loader.component';
+import { GlobalLoaderComponent } from '@shared/components/global-loader/global-loader.component';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +11,4 @@ import { GlobalLoaderComponent } from './shared/components/global-loader/global-
     <router-outlet />
   `,
 })
-export class AppComponent {
-  protected readonly title = signal('official-portfolio-frontend');
-}
+export class AppComponent {}

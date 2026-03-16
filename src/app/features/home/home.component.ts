@@ -1,21 +1,13 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnDestroy,
-  ElementRef,
-  ViewChildren,
-  QueryList,
-} from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ContentService } from '../../core/services/content.service';
-import { LoadingService } from '../../core/services/loading.service';
-import { MessagesService } from '../../core/services/messages.service';
-import { ResumeService, ResumeInfo } from '../../core/services/resume.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { PortfolioContent } from '../../core/models/portfolio.model';
+import { ContentService } from '@core/services/content.service';
+import { LoadingService } from '@core/services/loading.service';
+import { MessagesService } from '@core/services/messages.service';
+import { ResumeService, ResumeInfo } from '@core/services/resume.service';
+import { ThemeService } from '@core/services/theme.service';
+import { PortfolioContent } from '@core/models';
 
 @Component({
   selector: 'app-home',
@@ -42,8 +34,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   contactSending = false;
   contactSuccess = false;
   contactError = '';
-
-  @ViewChildren('revealEl') revealEls!: QueryList<ElementRef>;
 
   // Testimonial submission form
   testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
@@ -91,8 +81,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // this.setupScrollReveal();
-    // this.setupCounters();
     this.scrollHandler = () => {
       if (this.destroyed) return;
       const nav = document.getElementById('mainNav');
@@ -112,6 +100,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         { threshold: 0.3 },
       );
       io.observe(contactEl);
+      this.observers.push(io);
     }
   }
 
@@ -185,10 +174,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private refreshCaches(): void {
-    this._visibleTestis = this.content?.testimonials || [];
-    // this._visibleTestis = (this.content?.testimonials || []).filter((t) => t.visible); //exsiting
-    this._publishedPosts = this.content?.blogPosts || [];
-    // this._publishedPosts = (this.content?.blogPosts || []).filter((p) => p.published); exsiting
+    this._visibleTestis = (this.content?.testimonials || []).filter((t) => t.visible);
+    this._publishedPosts = (this.content?.blogPosts || []).filter((p) => p.published);
   }
 
   tickerItems(): string[] {
@@ -230,6 +217,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       { threshold: 0.1 },
     );
+    this.observers.push(io);
     setTimeout(() => {
       document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
     }, 100);
@@ -259,6 +247,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       { threshold: 0.5 },
     );
+    this.observers.push(io);
     setTimeout(() => {
       document.querySelectorAll('.stat-num[data-target]').forEach((el) => io.observe(el));
     }, 100);

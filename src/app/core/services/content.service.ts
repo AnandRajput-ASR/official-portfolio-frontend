@@ -1,33 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import {
-  Analytics,
-  BlogPost,
-  Certification,
-  Company,
-  CompanyProject,
-  Experience,
-  Hero,
-  PersonalProject,
-  PortfolioContent,
-  SiteSettings,
-  Skill,
-  Stat,
-  Testimonial,
-} from '../models/portfolio.model';
+import { environment } from '@env/environment';
+import { Hero, PortfolioContent, SiteSettings, Testimonial } from '@core/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentService {
   private base = environment.api.baseUrl + '/content';
-  constructor(
-    private http: HttpClient,
-    private sanitizer: DomSanitizer,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   /** Resolve a stored image value to a full URL.
    *  Handles: /uploads/... paths (from new file storage) and legacy data: base64 */
