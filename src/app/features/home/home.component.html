@@ -3,18 +3,18 @@
   [class.otw-active]="content.siteSettings.openToWork && !otwDismissed"
   *ngIf="!loading && content && !apiError; else loader"
 >
-  <!-- â•â•â• OPEN-TO-WORK BANNER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ OPEN-TO-WORK BANNER ════════════════════════════════════════════════ -->
   <div class="otw-banner" *ngIf="content.siteSettings.openToWork && !otwDismissed">
     <span class="otw-dot"></span>
     <span
       class="otw-text"
       [innerHTML]="content.siteSettings.openToWorkText || 'Open to Freelance'"
     ></span>
-    <a href="#contact" class="otw-cta">Let's talk â†’</a>
-    <button class="otw-close" (click)="dismissOtw()" aria-label="Dismiss">âœ•</button>
+    <a href="#contact" class="otw-cta">Let's talk →</a>
+    <button class="otw-close" (click)="dismissOtw()" aria-label="Dismiss">✕</button>
   </div>
 
-  <!-- â•â•â• NAV â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ NAV ══════════════════════════════════════════════════════════════════ -->
   <nav class="nav" id="mainNav">
     <div class="nav-logo">
       {{ content.siteSettings.nav.logoText || 'AR' }}<span class="dot">.</span>
@@ -49,8 +49,8 @@
         (click)="themeService.toggle()"
         [title]="themeService.isDark() ? 'Switch to Light' : 'Switch to Dark'"
       >
-        <span *ngIf="themeService.isDark()">â˜€ï¸</span>
-        <span *ngIf="!themeService.isDark()">ðŸŒ™</span>
+        <span *ngIf="themeService.isDark()">☀️</span>
+        <span *ngIf="!themeService.isDark()">🌙</span>
       </button>
 
       <!-- Resume quick link -->
@@ -59,7 +59,7 @@
         [href]="resumeService.getDownloadUrl()"
         class="btn-nav-resume"
         download
-        >â†“ Resume</a
+        >↓ Resume</a
       >
 
       <!-- Mobile hamburger -->
@@ -82,7 +82,7 @@
         <span class="nav-logo"
           >{{ content.siteSettings.nav.logoText || 'AR' }}<span class="dot">.</span></span
         >
-        <button class="mobile-close" (click)="closeMobileMenu()">âœ•</button>
+        <button class="mobile-close" (click)="closeMobileMenu()">✕</button>
       </div>
       <nav class="mobile-nav">
         <a href="#about" (click)="closeMobileMenu()">About</a>
@@ -97,16 +97,16 @@
           [href]="resumeService.getDownloadUrl()"
           class="btn-hero-primary"
           download
-          >â†“ Download Resume</a
+          >↓ Download Resume</a
         >
         <button class="theme-toggle-lg" (click)="themeService.toggle()">
-          {{ themeService.isDark() ? 'â˜€ï¸ Light Mode' : 'ðŸŒ™ Dark Mode' }}
+          {{ themeService.isDark() ? '☀️ Light Mode' : '🌙 Dark Mode' }}
         </button>
       </div>
     </div>
   </div>
 
-  <!-- â•â•â• HERO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ HERO ═════════════════════════════════════════════════════════════════ -->
   <section class="hero" id="home">
     <div class="hero-bg">
       <div class="hero-blob blob1"></div>
@@ -117,7 +117,7 @@
       <div class="hero-left">
         <div class="hero-badge anim-1">
           <span class="badge-dot"></span>
-          {{ content.siteSettings.hero.badgeText || 'Available for Freelance Â· Pune, India' }}
+          {{ content.siteSettings.hero.badgeText || 'Available for Freelance · Pune, India' }}
         </div>
         <!-- Heading Name -->
         <h1 class="hero-name anim-2">
@@ -138,7 +138,7 @@
         </div>
         <div class="hero-actions anim-6">
           <a href="#contact" class="btn-hero-primary">{{
-            content.siteSettings.hero.ctaPrimary || 'Hire Me â†’'
+            content.siteSettings.hero.ctaPrimary || 'Hire Me →'
           }}</a>
           <a href="#projects" class="btn-hero-secondary">{{
             content.siteSettings.hero.ctaSecondary || 'See My Work'
@@ -148,7 +148,7 @@
             [href]="resumeService.getDownloadUrl()"
             class="btn-hero-resume"
             download
-            >â†“ Resume</a
+            >↓ Resume</a
           >
         </div>
       </div>
@@ -163,11 +163,11 @@
               <div>
                 <p class="card-name">{{ content.hero.name }}</p>
                 <p class="card-title">
-                  {{ content.siteSettings.hero.cardTitle || '&#64; Accenture Â· Pune' }}
+                  {{ content.siteSettings.hero.cardTitle || '&#64; Accenture · Pune' }}
                 </p>
               </div>
               <span class="card-status"
-                >â— {{ content.siteSettings.hero.cardStatusText || 'Open to work' }}</span
+                >● {{ content.siteSettings.hero.cardStatusText || 'Open to work' }}</span
               >
             </div>
             <div class="card-stats">
@@ -183,7 +183,7 @@
               <span *ngFor="let sk of content.siteSettings.hero.cardSkills">{{ sk }}</span>
             </div>
             <div class="card-cta">
-              <a [href]="'mailto:' + content.hero.email" class="card-btn">Get In Touch â†’</a>
+              <a [href]="'mailto:' + content.hero.email" class="card-btn">Get In Touch →</a>
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@
     <div class="hero-scroll-hint"><span></span>scroll</div>
   </section>
 
-  <!-- â•â•â• TICKER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ TICKER ═══════════════════════════════════════════════════════════════ -->
   <div class="ticker-wrap" *ngIf="content.siteSettings.sections.ticker !== false">
     <div class="ticker">
       <!-- Doubled for seamless loop -->
@@ -205,7 +205,7 @@
     </div>
   </div>
 
-  <!-- â•â•â• ABOUT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ ABOUT ════════════════════════════════════════════════════════════════ -->
   <section id="about" class="about-section">
     <div class="about-grid">
       <div class="about-left reveal">
@@ -229,14 +229,14 @@
             content.siteSettings.freelance.showInAbout !== false
           "
         >
-          ðŸ’¼ <strong>Available for freelance.</strong> Angular SPA, cloud integrations, CI/CD
-          setup, Node.js APIs â€” let's talk.
+          💼 <strong>Available for freelance.</strong> Angular SPA, cloud integrations, CI/CD
+          setup, Node.js APIs — let's talk.
         </p>
         <div class="about-links">
-          <a [href]="'mailto:' + content.hero.email" class="alink">âœ‰ {{ content.hero.email }}</a>
-          <a [href]="content.hero.linkedin" target="_blank" class="alink">ðŸ”— LinkedIn Profile</a>
+          <a [href]="'mailto:' + content.hero.email" class="alink">✉ {{ content.hero.email }}</a>
+          <a [href]="content.hero.linkedin" target="_blank" class="alink">🔗 LinkedIn Profile</a>
           <a href="#contact" class="btn-hero-primary" style="margin-top: 0.5rem"
-            >Let's Work Together â†’</a
+            >Let's Work Together →</a
           >
         </div>
       </div>
@@ -256,7 +256,7 @@
           class="about-accenture-badge"
           *ngIf="content.siteSettings.about.accentureBadge.company"
         >
-          <span class="acc-logo">â¬¡</span>
+          <span class="acc-logo">⬡</span>
           <div>
             <p class="acc-company">{{ content.siteSettings.about.accentureBadge.company }}</p>
             <p class="acc-role">{{ content.siteSettings.about.accentureBadge.role }}</p>
@@ -268,7 +268,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• SKILLS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ SKILLS ═══════════════════════════════════════════════════════════════ -->
   <section
     id="skills"
     class="skills-section"
@@ -317,13 +317,13 @@
     </div>
   </section>
 
-  <!-- â•â•â• WORK EXPERIENCE by COMPANY â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ WORK EXPERIENCE by COMPANY ═══════════════════════════════════════════ -->
   <section id="projects" class="companies-section">
     <div class="section-head reveal">
       <p class="section-label">// Professional Work</p>
       <h2 class="section-title">Work Experience</h2>
       <p class="section-sub">
-        Enterprise projects delivered across companies â€” click a company to explore its projects.
+        Enterprise projects delivered across companies — click a company to explore its projects.
       </p>
     </div>
 
@@ -343,10 +343,10 @@
             <div class="co-info">
               <div class="co-name-row">
                 <h3 class="co-name">{{ company.name }}</h3>
-                <span class="co-current" *ngIf="company.current">â— Current</span>
+                <span class="co-current" *ngIf="company.current">● Current</span>
               </div>
               <p class="co-role">{{ company.role }}</p>
-              <p class="co-meta">{{ company.period }} Â· {{ company.location }}</p>
+              <p class="co-meta">{{ company.period }} · {{ company.location }}</p>
             </div>
           </div>
           <div class="co-header-right">
@@ -355,7 +355,7 @@
                 company.projects.length !== 1 ? 's' : ''
               }}</span
             >
-            <span class="co-chevron" [class.rotated]="isCompanyOpen(company.id)">â€º</span>
+            <span class="co-chevron" [class.rotated]="isCompanyOpen(company.id)">›</span>
           </div>
         </div>
 
@@ -378,7 +378,7 @@
                   [href]="project.link"
                   target="_blank"
                   class="co-proj-link"
-                  >View Project â†’</a
+                  >View Project →</a
                 >
               </div>
             </div>
@@ -388,7 +388,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• PERSONAL & FREELANCE PROJECTS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ PERSONAL & FREELANCE PROJECTS ═══════════════════════════════════════ -->
   <section
     id="personal-projects"
     class="personal-projects-section"
@@ -398,7 +398,7 @@
       <p class="section-label">// Personal & Freelance</p>
       <h2 class="section-title">Side Projects</h2>
       <p class="section-sub">
-        Hobby builds, freelance work, and open-source contributions â€” things I make because I
+        Hobby builds, freelance work, and open-source contributions — things I make because I
         enjoy building.
       </p>
     </div>
@@ -408,8 +408,8 @@
       class="pp-empty"
       *ngIf="!content.personalProjects || content.personalProjects.length === 0"
     >
-      <span>ðŸš€</span>
-      <p>Projects coming soon â€” check back!</p>
+      <span>🚀</span>
+      <p>Projects coming soon — check back!</p>
     </div>
 
     <div class="pp-grid" *ngIf="content.personalProjects && content.personalProjects.length > 0">
@@ -428,10 +428,10 @@
           >
             {{
               project.type === 'freelance'
-                ? 'ðŸ’¼ Freelance'
+                ? '💼 Freelance'
                 : project.type === 'opensource'
-                  ? 'ðŸŒ Open Source'
-                  : 'âš¡ Personal'
+                  ? '🌐 Open Source'
+                  : '⚡ Personal'
             }}
           </span>
           <span
@@ -442,14 +442,14 @@
           >
             {{
               project.status === 'live'
-                ? 'â— Live'
+                ? '● Live'
                 : project.status === 'wip'
-                  ? 'âŸ³ In Progress'
+                  ? '⟳ In Progress'
                   : 'Archive'
             }}
           </span>
           <span class="pp-year">{{ project.year }}</span>
-          <span class="pp-featured-badge" *ngIf="project.featured">â˜… Featured</span>
+          <span class="pp-featured-badge" *ngIf="project.featured">★ Featured</span>
         </div>
 
         <h3 class="pp-title">{{ project.title }}</h3>
@@ -479,14 +479,14 @@
             target="_blank"
             class="pp-link pp-link-live"
           >
-            â†— Live Demo
+            ↗ Live Demo
           </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- â•â•â• CERTIFICATIONS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ CERTIFICATIONS ═══════════════════════════════════════════════════════ -->
   <section
     id="certs"
     class="certs-section"
@@ -594,7 +594,7 @@
         <div class="cert-info">
           <p class="cert-code" [style.color]="cert.accentColor">{{ cert.code }}</p>
           <h3 class="cert-name">{{ cert.name }}</h3>
-          <p class="cert-issuer">{{ cert.issuer }} Certified Â· {{ cert.level }}</p>
+          <p class="cert-issuer">{{ cert.issuer }} Certified · {{ cert.level }}</p>
           <p class="cert-year">{{ cert.issueYear }}</p>
         </div>
 
@@ -605,7 +605,7 @@
             [style.color]="cert.accentColor"
             [style.border-color]="cert.accentColor + '40'"
           >
-            {{ cert.level === 'Expert' ? cert.level + ' â˜…' : cert.level }}
+            {{ cert.level === 'Expert' ? cert.level + ' ★' : cert.level }}
           </span>
           <a
             *ngIf="cert.credlyLink"
@@ -626,7 +626,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• EXPERIENCE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ EXPERIENCE ═══════════════════════════════════════════════════════════ -->
   <section
     id="experience"
     class="exp-section"
@@ -643,7 +643,7 @@
           <p class="tl-period">{{ exp.period }}</p>
           <h3 class="tl-role">{{ exp.role }}</h3>
           <p class="tl-company">
-            {{ exp.company }} <span>Â· {{ exp.location }}</span>
+            {{ exp.company }} <span>· {{ exp.location }}</span>
           </p>
           <p class="tl-desc">{{ exp.description }}</p>
         </div>
@@ -651,7 +651,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• TESTIMONIALS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ TESTIMONIALS ═══════════════════════════════════════════════════════ -->
   <section
     id="testimonials"
     class="testimonials-section"
@@ -666,7 +666,7 @@
         <div class="testi-quote-mark">"</div>
         <p class="testi-quote">{{ t.quote }}</p>
         <div class="testi-stars">
-          <span class="testi-star" *ngFor="let s of stars(t.rating)">â˜…</span>
+          <span class="testi-star" *ngFor="let s of stars(t.rating)">★</span>
         </div>
         <div class="testi-author">
           <div class="testi-avatar" *ngIf="!t.avatar">{{ t.name.charAt(0) }}</div>
@@ -678,7 +678,7 @@
           />
           <div class="testi-info">
             <p class="testi-name">{{ t.name }}</p>
-            <p class="testi-role">{{ t.role }} Â· {{ t.company }}</p>
+            <p class="testi-role">{{ t.role }} · {{ t.company }}</p>
           </div>
         </div>
       </div>
@@ -694,15 +694,15 @@
         (click)="showTestiSubmitForm = !showTestiSubmitForm"
         *ngIf="!testiSubmitSuccess"
       >
-        {{ showTestiSubmitForm ? 'âœ• Cancel' : 'âœ¦ Share Your Experience Working With Me' }}
+        {{ showTestiSubmitForm ? '✕ Cancel' : '✦ Share Your Experience Working With Me' }}
       </button>
       <div class="testi-submit-success" *ngIf="testiSubmitSuccess">
-        âœ“ Thank you! Your testimonial has been submitted and will be reviewed before publishing.
+        ✓ Thank you! Your testimonial has been submitted and will be reviewed before publishing.
       </div>
       <div class="testi-submit-form" [class.open]="showTestiSubmitForm && !testiSubmitSuccess">
         <p class="tsf-heading">Leave a Testimonial</p>
-        <p class="tsf-sub">Reviewed by Anand before publishing â€” usually within 1â€“2 days.</p>
-        <div class="error-banner" *ngIf="testiSubmitError">âš  {{ testiSubmitError }}</div>
+        <p class="tsf-sub">Reviewed by Anand before publishing — usually within 1–2 days.</p>
+        <div class="error-banner" *ngIf="testiSubmitError">⚠ {{ testiSubmitError }}</div>
         <div class="form-row">
           <div class="cform-group">
             <label>Your Name *</label
@@ -731,14 +731,14 @@
           [disabled]="testiSubmitting"
           style="margin-top: 0.5rem"
         >
-          <span *ngIf="!testiSubmitting">Submit for Review â†’</span>
+          <span *ngIf="!testiSubmitting">Submit for Review →</span>
           <span *ngIf="testiSubmitting" class="sending-spinner"></span>
         </button>
       </div>
     </div>
   </section>
 
-  <!-- â•â•â• BLOG / WRITING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ BLOG / WRITING ═════════════════════════════════════════════════════ -->
   <section
     id="blog"
     class="blog-section"
@@ -764,14 +764,14 @@
         <div class="blog-footer">
           <span class="blog-date">{{ post.publishedAt | date: 'MMM d, yyyy' }}</span>
           <button class="blog-read-btn" (click)="navigateToBlog(post.slug)">
-            Read Article â†’
+            Read Article →
           </button>
         </div>
       </article>
     </div>
   </section>
 
-  <!-- â•â•â• FREELANCE CTA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ FREELANCE CTA ════════════════════════════════════════════════════════ -->
   <section
     class="freelance-cta"
     *ngIf="
@@ -794,7 +794,7 @@
         <a
           [href]="'mailto:' + content.hero.email + '?subject=Freelance Inquiry'"
           class="btn-hero-primary"
-          >Start a Conversation â†’</a
+          >Start a Conversation →</a
         >
         <a
           *ngIf="resumeInfo?.available"
@@ -802,16 +802,16 @@
           class="btn-hero-resume"
           download
           (click)="trackResumeDownload()"
-          >â†“ Download Resume</a
+          >↓ Download Resume</a
         >
       </div>
       <div class="fcta-services">
-        <span *ngFor="let s of content.siteSettings.freelance.services">âœ¦ {{ s }}</span>
+        <span *ngFor="let s of content.siteSettings.freelance.services">✦ {{ s }}</span>
       </div>
     </div>
   </section>
 
-  <!-- â•â•â• CONTACT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ CONTACT ══════════════════════════════════════════════════════════════ -->
   <section id="contact" class="contact-section">
     <div class="contact-grid">
       <div class="contact-left reveal">
@@ -825,28 +825,28 @@
         ></h2>
         <div class="contact-links">
           <a [href]="'mailto:' + content.hero.email" class="clink">
-            <span class="clink-icon">âœ‰</span>
+            <span class="clink-icon">✉</span>
             <div>
               <p class="clink-label">Email</p>
               <p class="clink-val">{{ content.hero.email }}</p>
             </div>
           </a>
           <a [href]="content.hero.linkedin" target="_blank" class="clink">
-            <span class="clink-icon">ðŸ”—</span>
+            <span class="clink-icon">🔗</span>
             <div>
               <p class="clink-label">LinkedIn</p>
               <p class="clink-val">Connect with me</p>
             </div>
           </a>
           <a *ngIf="content.hero.github" [href]="content.hero.github" target="_blank" class="clink">
-            <span class="clink-icon">âŒ¥</span>
+            <span class="clink-icon">⌥</span>
             <div>
               <p class="clink-label">GitHub</p>
               <p class="clink-val">See my code</p>
             </div>
           </a>
           <span class="clink">
-            <span class="clink-icon">ðŸ“</span>
+            <span class="clink-icon">📍</span>
             <div>
               <p class="clink-label">Location</p>
               <p class="clink-val">{{ content.hero.location }}</p>
@@ -859,7 +859,7 @@
               content.siteSettings.freelance.showInContact !== false
             "
           >
-            <span class="clink-icon avail-dot">â—</span>
+            <span class="clink-icon avail-dot">●</span>
             <div>
               <p class="clink-label">Status</p>
               <p class="clink-val">Available for freelance</p>
@@ -869,13 +869,13 @@
       </div>
       <div class="contact-right reveal">
         <div class="success-banner" *ngIf="contactSuccess">
-          âœ“
+          ✓
           {{
             content.siteSettings.contact.successMessage ||
               'Message sent! I will get back to you shortly.'
           }}
         </div>
-        <div class="error-banner" *ngIf="contactError">âš  {{ contactError }}</div>
+        <div class="error-banner" *ngIf="contactError">⚠ {{ contactError }}</div>
         <div class="cform">
           <div class="cform-row">
             <div class="cform-group">
@@ -915,7 +915,7 @@
             [disabled]="contactSending"
             style="width: 100%; justify-content: center"
           >
-            <span *ngIf="!contactSending">Send Message â†’</span>
+            <span *ngIf="!contactSending">Send Message →</span>
             <span *ngIf="contactSending" class="sending-spinner"></span>
           </button>
         </div>
@@ -923,14 +923,14 @@
     </div>
   </section>
 
-  <!-- â•â•â• RESUME BANNER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ RESUME BANNER ════════════════════════════════════════════════════════ -->
   <div class="resume-banner" *ngIf="resumeInfo?.available">
     <div class="rb-left">
-      <span class="rb-icon">ðŸ“„</span>
+      <span class="rb-icon">📄</span>
       <div>
         <p class="rb-title">Download My Resume</p>
         <p class="rb-meta">
-          {{ resumeInfo?.fileName }} Â· {{ resumeService.formatSize(resumeInfo?.size || 0) }}
+          {{ resumeInfo?.fileName }} · {{ resumeService.formatSize(resumeInfo?.size || 0) }}
         </p>
       </div>
     </div>
@@ -940,11 +940,11 @@
       download
       target="_blank"
       (click)="trackResumeDownload()"
-      >â†“ Download PDF</a
+      >↓ Download PDF</a
     >
   </div>
 
-  <!-- â•â•â• FOOTER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════════ -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-logo">
@@ -962,16 +962,16 @@
 </div>
 
 <ng-template #loader>
-  <!-- API error state â€” shown when request fails -->
+  <!-- API error state — shown when request fails -->
   <div class="api-error-page" *ngIf="apiError && !loading; else skeletonTpl">
     <div class="api-error-card">
-      <div class="ae-icon">âš¡</div>
+      <div class="ae-icon">⚡</div>
       <h2 class="ae-title">Couldn't load portfolio</h2>
       <p class="ae-msg">The server didn't respond. Check your connection or try again.</p>
-      <button class="ae-retry" (click)="retryLoad()">â†º Retry</button>
+      <button class="ae-retry" (click)="retryLoad()">↺ Retry</button>
     </div>
   </div>
-  <!-- Skeleton screen â€” shown while loading -->
+  <!-- Skeleton screen — shown while loading -->
   <ng-template #skeletonTpl>
     <div class="skeleton-page">
       <!-- Nav skeleton -->
