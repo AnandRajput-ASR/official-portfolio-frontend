@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { MessagesResponse } from '../models/portfolio.model';
+import { environment } from '@env/environment';
+import { MessagesResponse } from '@core/models';
 
 export interface ContactPayload {
   name: string;

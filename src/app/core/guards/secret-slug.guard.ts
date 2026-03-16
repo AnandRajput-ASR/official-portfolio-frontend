@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { map, catchError, of } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 
 export const secretSlugGuard: CanActivateFn = (route) => {
   const http = inject(HttpClient);
