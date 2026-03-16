@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { ContentService } from '../../../core/services/content.service';
-import { BlogPost, PortfolioContent } from '../../../core/models/portfolio.model';
+import { ContentService } from '@core/services/content.service';
+import { BlogPost, PortfolioContent } from '@core/models';
 
 @Component({
   selector: 'app-blog-view',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   template: `
     <div class="bv-page" *ngIf="post; else loading">
       <!-- Back nav -->
