@@ -117,6 +117,8 @@ export class DashboardComponent implements OnInit {
 
   // ── Resume ────────────────────────────────────────────────────────────────
   resumeInfo: ResumeInfo | null = null;
+  resumeDownloadName = '';
+  resumeDownloadNameSaving = false;
   resumeDragOver = false;
   uploadProgress = 0;
   uploadState: 'idle' | 'reading' | 'uploading' | 'done' | 'error' = 'idle';
@@ -818,7 +820,13 @@ export class DashboardComponent implements OnInit {
 
   // ── RESUME ────────────────────────────────────────────────────────────────
   loadResumeInfo(): void {
-    this.resumeService.getInfo().subscribe({ next: (i) => (this.resumeInfo = i), error: () => {} });
+    this.resumeService.getInfo().subscribe({
+      next: (i) => {
+        this.resumeInfo = i;
+        this.resumeDownloadName = i.downloadName || '';
+      },
+      error: () => {},
+    });
   }
   onResumeFileSelected(e: Event): void {
     const f = (e.target as HTMLInputElement).files?.[0];
@@ -880,6 +888,21 @@ export class DashboardComponent implements OnInit {
         this.toast.success('Resume removed.');
       },
       error: () => this.toast.error('Delete failed'),
+    });
+  }
+
+  saveDownloadName(): void {
+    this.resumeDownloadNameSaving = true;
+    this.resumeService.updateDownloadName(this.resumeDownloadName).subscribe({
+      next: () => {
+        this.resumeDownloadNameSaving = false;
+        if (this.resumeInfo) this.resumeInfo.downloadName = this.resumeDownloadName || undefined;
+        this.toast.success('Download name saved!');
+      },
+      error: () => {
+        this.resumeDownloadNameSaving = false;
+        this.toast.error('Save failed');
+      },
     });
   }
 

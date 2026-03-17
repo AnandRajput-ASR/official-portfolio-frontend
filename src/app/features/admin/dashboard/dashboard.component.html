@@ -2217,6 +2217,34 @@
         </div>
       </ng-template>
 
+      <!-- Download filename -->
+      <div class="settings-card" style="margin-top: 1.25rem" *ngIf="resumeInfo?.available">
+        <h3 style="margin-bottom: 0.5rem">📥 Download Filename</h3>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem">
+          The filename visitors see in their browser when downloading. Must end with <code>.pdf</code>.<br />
+          Leave blank to use the uploaded filename: <code>{{ resumeInfo?.fileName }}</code>
+        </p>
+        <div class="form-row" style="align-items:flex-end;gap:0.75rem">
+          <div class="form-group" style="flex:1;margin:0">
+            <label>Filename</label>
+            <input
+              type="text"
+              [(ngModel)]="resumeDownloadName"
+              placeholder="{{ resumeInfo?.fileName }}"
+              style="font-family:'Space Mono',monospace;font-size:0.82rem"
+            />
+          </div>
+          <button
+            class="btn btn-primary btn-sm"
+            (click)="saveDownloadName()"
+            [disabled]="resumeDownloadNameSaving"
+            style="margin-bottom:0.1rem"
+          >
+            {{ resumeDownloadNameSaving ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+      </div>
+
       <!-- Upload dropzone -->
       <div
         class="resume-dropzone"
