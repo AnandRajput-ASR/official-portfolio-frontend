@@ -122,8 +122,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submitPublicTestimonial(): void {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!this.testiSubmitForm.name || !this.testiSubmitForm.quote) {
       this.testiSubmitError = 'Name and your testimonial are required.';
+      return;
+    }
+    if (!this.testiSubmitForm.email || !emailPattern.test(this.testiSubmitForm.email)) {
+      this.testiSubmitError = 'A valid email address is required.';
       return;
     }
     this.testiSubmitting = true;

@@ -53,7 +53,7 @@
   "testi.name": "Your Name *",
   "testi.role": "Role / Title",
   "testi.company": "Company",
-  "testi.email": "Your Email (optional)",
+  "testi.email": "Your Email *",
   "testi.emailPlaceholder": "jane@company.com",
   "testi.quote": "Your Testimonial *",
   "testi.quotePlaceholder": "Describe your experience working with Anand...",

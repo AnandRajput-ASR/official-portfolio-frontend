@@ -53,7 +53,7 @@
   "testi.name": "お名前 *",
   "testi.role": "役職",
   "testi.company": "会社名",
-  "testi.email": "メールアドレス（任意）",
+  "testi.email": "メールアドレス *",
   "testi.emailPlaceholder": "yamada@company.com",
   "testi.quote": "推薦文 *",
   "testi.quotePlaceholder": "Anandと働いた経験を教えてください...",
