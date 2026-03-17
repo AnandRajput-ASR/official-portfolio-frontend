@@ -58,9 +58,9 @@
       <button
         class="lang-toggle"
         (click)="langService.toggle()"
-        [title]="langService.isHindi() ? 'Switch to English' : 'हिंदी में देखें'"
+        title="Switch language"
         aria-label="Toggle language"
-      >{{ langService.isHindi() ? 'EN' : 'हि' }}</button>
+      >{{ langService.label() }}</button>
 
       <!-- Resume quick link -->
       <a
