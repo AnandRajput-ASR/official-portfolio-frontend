@@ -14,6 +14,21 @@
   --amber-dim: rgba(245, 166, 35, 0.1);
   --amber-glow: rgba(245, 166, 35, 0.25);
   --green: #4caf50;
+  --nav-scrolled-bg: rgba(13, 13, 13, 0.95);
+}
+
+:host-context([data-theme='light']) {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f2f0ec;
+  --border: #e0ddd8;
+  --text: #1a1816;
+  --muted: #6b6560;
+  --amber: #d4890a;
+  --amber-dim: rgba(212, 137, 10, 0.08);
+  --amber-glow: rgba(212, 137, 10, 0.2);
+  --green: #2e7d32;
+  --nav-scrolled-bg: rgba(250, 249, 247, 0.95);
 }
 
 // ── SKELETON SCREEN ──────────────────────────────────────────────────────────
@@ -186,7 +201,7 @@
     border-color 0.3s,
     top 0.3s;
   &.scrolled {
-    background: rgba(13, 13, 13, 0.95);
+    background: var(--nav-scrolled-bg);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -1923,6 +1938,47 @@
 
 // ─── LIGHT MODE overrides for home ────────────────────────────────────────────
 :host-context([data-theme='light']) {
+  // Mobile menu overlay — lighter scrim
+  .mobile-menu-bg {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  // Resume gate overlay — lighter scrim
+  .resume-gate-overlay {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  // Nav brand text on light bg
+  .nav {
+    border-bottom-color: var(--border);
+  }
+
+  // Ticker
+  .ticker-wrap {
+    background: var(--surface2);
+    border-color: var(--border);
+  }
+
+  // About section quirks
+  .about-stat {
+    border-color: var(--border);
+  }
+
+  // Skills section
+  .skill-card {
+    background: var(--surface);
+  }
+
+  // Project cards
+  .proj-card {
+    background: var(--surface);
+  }
+
+  // Timeline
+  .timeline-line {
+    background: var(--border);
+  }
+
   .hero-card.card-front {
     box-shadow:
       0 4px 40px rgba(0, 0, 0, 0.1),
