@@ -9,6 +9,13 @@ export interface FreelanceConfig {
   showInContact: boolean;
 }
 
+export interface LearningItem {
+  label: string;
+  icon: string;
+  type: 'book' | 'course' | 'tech' | 'other';
+  url?: string;
+}
+
 export interface SiteSettings {
   openToWork: boolean;
   openToWorkText: string;
@@ -53,4 +60,11 @@ export interface SiteSettings {
    *  Used to generate robots.txt Sitemap directive and sitemap.xml <loc> entries
    *  on the backend — change this field to instantly update SEO without redeploying. */
   siteUrl: string;
+  /** When true, visitors must enter their email before the resume download begins. */
+  resumeProtected: boolean;
+  /** "Currently learning" widget displayed near the footer. */
+  learning: {
+    enabled: boolean;
+    items: LearningItem[];
+  };
 }
