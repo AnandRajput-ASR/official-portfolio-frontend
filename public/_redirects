@@ -1,1 +1,10 @@
-/*  /index.html  200
+# ── Proxy: API calls to Express backend
+# Replace YOUR_BACKEND_URL with your actual Express backend URL (e.g. https://my-api.onrender.com)
+/api/*        https://YOUR_BACKEND_URL/api/:splat        200
+
+# ── Dynamic SEO files (served by backend, reflect siteUrl from DB — no redeploy needed)
+/robots.txt   https://YOUR_BACKEND_URL/robots.txt        200
+/sitemap.xml  https://YOUR_BACKEND_URL/sitemap.xml       200
+
+# ── Angular SPA — catch all other routes
+/*            /index.html                                200

@@ -1160,6 +1160,18 @@
             />
           </div>
         </div>
+        <div class="form-group" style="margin-top: 0.75rem">
+          <label>🌐 Site URL <small>(used in robots.txt &amp; sitemap.xml — no redeploy needed)</small></label>
+          <input
+            type="url"
+            [(ngModel)]="settingsEdit.siteUrl"
+            (ngModelChange)="markDirty()"
+            placeholder="https://anandrajput.dev"
+          />
+          <small style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block">
+            Changing this updates <code>/robots.txt</code> and <code>/sitemap.xml</code> instantly without redeploying.
+          </small>
+        </div>
       </div>
 
       <!-- Hero Content -->

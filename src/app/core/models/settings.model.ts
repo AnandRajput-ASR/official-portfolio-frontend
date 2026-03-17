@@ -49,4 +49,8 @@ export interface SiteSettings {
   contact: { heading: string; successMessage: string };
   footer: { text: string; copy: string };
   nav: { logoText: string; showResume: boolean };
+  /** Canonical public URL of the site (e.g. https://anandrajput.dev).
+   *  Used to generate robots.txt Sitemap directive and sitemap.xml <loc> entries
+   *  on the backend — change this field to instantly update SEO without redeploying. */
+  siteUrl: string;
 }

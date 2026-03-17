@@ -30,10 +30,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private observers: IntersectionObserver[] = [];
 
   // Contact form
-  contactForm = { name: '', email: '', message: '' };
+  contactForm = { name: '', email: '', message: '', _hp: '' };
   contactSending = false;
   contactSuccess = false;
   contactError = '';
+  emailCopied = false;
 
   // Testimonial submission form
   testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
@@ -291,7 +292,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.contactSending = false;
         this.contactSuccess = true;
-        this.contactForm = { name: '', email: '', message: '' };
+        this.contactForm = { name: '', email: '', message: '', _hp: '' };
         this.contentService.trackEvent('contactSubmit');
         setTimeout(() => (this.contactSuccess = false), 6000);
       },
@@ -337,5 +338,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   trackById(_: number, item: { id: string }): string {
     return item.id;
+  }
+
+  /** Ensures external links always have a protocol so the browser doesn't
+   *  treat bare URLs like "www.google.com" as relative paths. */
+  externalUrl(url: string | null | undefined): string {
+    if (!url || url === '#') return '#';
+    return /^https?:\/\//i.test(url) ? url : 'https://' + url;
+  }
+
+  /** Copies email address to clipboard; shows confirmation for 2 s. */
+  copyEmail(): void {
+    navigator.clipboard.writeText(this.content!.hero.email).then(() => {
+      this.emailCopied = true;
+      setTimeout(() => (this.emailCopied = false), 2000);
+    });
   }
 }
