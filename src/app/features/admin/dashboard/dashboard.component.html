@@ -24,7 +24,7 @@
       <span></span><span></span><span></span>
     </button>
     <span class="mob-logo">&lt;ADMIN /&gt;</span>
-    <button class="mob-theme-btn" (click)="themeService.toggle()">
+    <button class="mob-theme-btn" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
       {{ themeService.isDark() ? '☀️' : '🌙' }}
     </button>
   </div>
@@ -95,7 +95,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button class="theme-btn" (click)="themeService.toggle()">
+      <button class="theme-btn" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         <span>{{ themeService.isDark() ? '☀️' : '🌙' }}</span>
         {{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}
       </button>
@@ -1675,6 +1675,7 @@
                 [class.starred]="msg.starred"
                 (click)="toggleStar(msg, $event)"
                 [title]="msg.starred ? 'Unstar' : 'Star'"
+                [attr.aria-label]="msg.starred ? 'Unstar message' : 'Star message'"
               >
                 ★
               </button>
@@ -1701,6 +1702,8 @@
                 class="star-btn lg"
                 [class.starred]="selectedMessage.starred"
                 (click)="toggleStar(selectedMessage, $event)"
+                [title]="selectedMessage.starred ? 'Unstar' : 'Star'"
+                [attr.aria-label]="selectedMessage.starred ? 'Unstar message' : 'Star message'"
               >
                 ★
               </button>
