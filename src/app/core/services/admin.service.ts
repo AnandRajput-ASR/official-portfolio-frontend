@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import {
   Analytics,
@@ -156,7 +156,9 @@ export class AdminService {
   }
 
   getAnalytics(): Observable<Analytics> {
-    return this.http.get<Analytics>(this.base + '/analytics');
+    return this.http
+      .get<{ success: boolean; data: Analytics }>(this.base + '/analytics')
+      .pipe(map((r) => r.data));
   }
 
   resetAnalytics(): Observable<any> {
