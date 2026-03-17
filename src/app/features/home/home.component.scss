@@ -1395,6 +1395,26 @@
       color: var(--green);
       animation: blink 1.5s infinite;
     }
+    // Copy-email variant — acts as a button styled identically to a clink row
+    &.clink-copy-email {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: all 0.2s;
+      &:hover {
+        border-color: var(--amber);
+        background: var(--amber-dim);
+        color: var(--text);
+      }
+      .clink-val {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-weight: 400;
+      }
+    }
   }
   .success-banner {
     background: rgba(76, 175, 80, 0.1);

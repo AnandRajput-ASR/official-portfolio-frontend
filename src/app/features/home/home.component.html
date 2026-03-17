@@ -376,7 +376,7 @@
                 </div>
                 <a
                   *ngIf="project.link && project.link !== '#'"
-                  [href]="project.link"
+                  [href]="externalUrl(project.link)"
                   target="_blank"
                   class="co-proj-link"
                   >View Project →</a
@@ -463,7 +463,7 @@
         <div class="pp-links">
           <a
             *ngIf="project.githubUrl && project.githubUrl !== '#'"
-            [href]="project.githubUrl"
+            [href]="externalUrl(project.githubUrl)"
             target="_blank"
             class="pp-link pp-link-github"
           >
@@ -476,7 +476,7 @@
           </a>
           <a
             *ngIf="project.liveUrl && project.liveUrl !== '#'"
-            [href]="project.liveUrl"
+            [href]="externalUrl(project.liveUrl)"
             target="_blank"
             class="pp-link pp-link-live"
           >
@@ -588,7 +588,7 @@
             class="cert-badge cert-badge-uploaded"
             *ngIf="cert.badgeType === 'upload' && cert.badgeLink"
           >
-            <img [src]="contentService.getImageUrl(cert.badgeLink)" [alt]="cert.name" />
+            <img [src]="contentService.getImageUrl(cert.badgeLink)" [alt]="cert.name" loading="lazy" />
           </div>
         </div>
 
@@ -610,7 +610,7 @@
           </span>
           <a
             *ngIf="cert.credlyLink"
-            [href]="cert.credlyLink"
+            [href]="externalUrl(cert.credlyLink)"
             target="_blank"
             class="cert-credly-link"
             title="Verify on Credly"
@@ -653,6 +653,7 @@
   </section>
 
   <!-- ═══ TESTIMONIALS ═══════════════════════════════════════════════════════ -->
+  @defer (on idle) {
   <section
     id="testimonials"
     class="testimonials-section"
@@ -676,6 +677,7 @@
             *ngIf="t.avatar"
             [src]="contentService.getImageUrl(t.avatar)"
             [alt]="t.name"
+            loading="lazy"
           />
           <div class="testi-info">
             <p class="testi-name">{{ t.name }}</p>
@@ -785,8 +787,10 @@
       </div>
     </div>
   </section>
+  } <!-- end @defer testimonials -->
 
   <!-- ═══ BLOG / WRITING ═════════════════════════════════════════════════════ -->
+  @defer (on idle) {
   <section
     id="blog"
     class="blog-section"
@@ -818,6 +822,7 @@
       </article>
     </div>
   </section>
+  } <!-- end @defer blog -->
 
   <!-- ═══ FREELANCE CTA ════════════════════════════════════════════════════════ -->
   <section
@@ -872,13 +877,24 @@
           "
         ></h2>
         <div class="contact-links">
-          <a [href]="'mailto:' + content.hero.email" class="clink">
+          <a [href]="'mailto:' + content.hero.email" class="clink" target="_blank">
             <span class="clink-icon">✉</span>
-            <div>
+            <div style="flex:1">
               <p class="clink-label">Email</p>
               <p class="clink-val">{{ content.hero.email }}</p>
             </div>
           </a>
+          <button
+            class="clink clink-copy-email"
+            (click)="copyEmail()"
+            [title]="emailCopied ? 'Copied!' : 'Copy email address'"
+          >
+            <span class="clink-icon">{{ emailCopied ? '\u2713' : '\u29c9' }}</span>
+            <div>
+              <p class="clink-label">{{ emailCopied ? 'Copied!' : 'Copy' }}</p>
+              <p class="clink-val">to clipboard</p>
+            </div>
+          </button>
           <a [href]="content.hero.linkedin" target="_blank" class="clink">
             <span class="clink-icon">🔗</span>
             <div>
@@ -956,6 +972,10 @@
               placeholder="Hi Anand, I have a project I'd like to discuss..."
               [disabled]="contactSending"
             ></textarea>
+          </div>
+          <!-- Honeypot: hidden from real users; bots fill it and get silently discarded -->
+          <div style="position:absolute;left:-9999px;height:0;overflow:hidden;" aria-hidden="true">
+            <input type="text" name="_hp" [(ngModel)]="contactForm._hp" tabindex="-1" autocomplete="off" />
           </div>
           <button
             class="btn-hero-primary"

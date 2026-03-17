@@ -395,6 +395,7 @@ export class DashboardComponent implements OnInit {
         copy: '© 2026 · Pune, India · Built with Angular & Node.js',
       },
       nav: { logoText: 'AR', showResume: true },
+      siteUrl: 'https://anandrajput.dev',
     };
   }
 
@@ -1481,7 +1482,10 @@ export class DashboardComponent implements OnInit {
     const reorder = (arr: any[]) => {
       const map: Record<string, number> = {};
       orderPayload.forEach((o) => (map[o.id] = o.displayOrder));
-      return [...arr].sort((a, b) => (map[a.id] ?? a.displayOrder) - (map[b.id] ?? b.displayOrder));
+      const sorted = [...arr].sort((a, b) => (map[a.id] ?? a.displayOrder) - (map[b.id] ?? b.displayOrder));
+      // Sync the displayOrder property so Save All sends the correct values
+      sorted.forEach((item, idx) => (item.displayOrder = idx));
+      return sorted;
     };
     if (section === 'skills') this.skillsEdit = reorder(this.skillsEdit);
     else if (section === 'companies') this.companiesEdit = reorder(this.companiesEdit);
