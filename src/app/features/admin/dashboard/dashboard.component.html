@@ -858,6 +858,13 @@
             <span class="ac-icon">👁</span>
             <div class="ac-val">{{ analytics.pageViews }}</div>
             <div class="ac-label">Page Views</div>
+            <div class="ac-sublabel" *ngIf="analytics.thisMonth !== undefined">
+              {{ analytics.thisMonth }} this month
+              <span *ngIf="analytics.lastMonth !== undefined && analytics.lastMonth > 0"
+                    [style.color]="(analytics.thisMonth ?? 0) >= (analytics.lastMonth ?? 0) ? 'var(--green)' : '#ef4444'">
+                &nbsp;{{ monthDelta() }}
+              </span>
+            </div>
           </div>
           <div class="analytics-card ac-highlight">
             <span class="ac-icon">📄</span>
@@ -879,6 +886,35 @@
             <div class="ac-val">{{ conversionRate() }}</div>
             <div class="ac-label">Contact Conversion</div>
           </div>
+        </div>
+
+        <!-- 30-day visits chart -->
+        <div class="analytics-section" style="margin-top:1.5rem">
+          <h3 class="analytics-section-title">Page Visits — Last 30 Days</h3>
+          <div class="visit-chart" *ngIf="visitChartBars().length > 0; else noVisits">
+            <div class="vc-bars">
+              <div
+                class="vc-bar-col"
+                *ngFor="let b of visitChartBars()"
+                [title]="b.label + ': ' + b.count + ' visits'"
+              >
+                <div
+                  class="vc-bar-fill"
+                  [style.height.%]="(b.count / visitChartMax()) * 100"
+                  [class.vc-bar-today]="b.date === today()"
+                ></div>
+                <span class="vc-bar-val" *ngIf="b.count > 0">{{ b.count }}</span>
+              </div>
+            </div>
+            <div class="vc-axis">
+              <span>{{ visitChartBars()[0]?.label }}</span>
+              <span>{{ visitChartBars()[14]?.label }}</span>
+              <span>Today</span>
+            </div>
+          </div>
+          <ng-template #noVisits>
+            <p class="muted-text" style="font-size:0.82rem;padding:1rem 0">No visit data yet — visits will appear here as people view the portfolio.</p>
+          </ng-template>
         </div>
 
         <!-- Project clicks table -->
@@ -1257,6 +1293,26 @@
             class="btn-add"
             (click)="settingsEdit.learning.items.push({ label: '', icon: '📖', type: 'other' }); markDirty()"
           >+ Add Item</button>
+        </div>
+      </div>
+
+      <!-- Visitor Counter Widget -->
+      <div class="settings-card" style="margin-top: 1.25rem">
+        <div class="settings-card-header">
+          <div>
+            <h3>👁 Public Visitor Counter</h3>
+            <p>Show "X visitors this month" in the portfolio footer. Only appears once the threshold is reached.</p>
+          </div>
+          <label class="big-toggle">
+            <input type="checkbox" [(ngModel)]="settingsEdit.visitorCount.show" (ngModelChange)="markDirty()" />
+            <span class="big-toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-row" style="margin-top:1rem" *ngIf="settingsEdit.visitorCount.show">
+          <div class="form-group xs">
+            <label>Show after <small>(min visits)</small></label>
+            <input type="number" min="0" [(ngModel)]="settingsEdit.visitorCount.threshold" (ngModelChange)="markDirty()" />
+          </div>
         </div>
       </div>
 

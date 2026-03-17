@@ -50,6 +50,12 @@ export class ContentService {
       .subscribe({ error: () => {} });
   }
 
+  getVisitorCount(): Observable<{ thisMonth: number; lastMonth: number }> {
+    return this.http.get<{ thisMonth: number; lastMonth: number }>(
+      this.base + '/analytics/visitor-count'
+    );
+  }
+
   // Image upload (returns { url: '/uploads/filename.ext' })
   uploadImage(fileName: string, fileData: string): Observable<{ url: string }> {
     return this.http.post<{ url: string }>(this.base + '/upload-image', { fileName, fileData });

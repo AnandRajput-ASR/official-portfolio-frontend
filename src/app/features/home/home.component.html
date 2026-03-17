@@ -1055,6 +1055,9 @@
         <a [href]="content.hero.linkedin" target="_blank">LinkedIn</a>
         <a *ngIf="content.hero.github" [href]="content.hero.github" target="_blank">GitHub</a>
       </div>
+      <span class="footer-visitor-count" *ngIf="visitorCount !== null">
+        👁 {{ visitorCount }} visitors this month
+      </span>
     </div>
   </footer>
 </div>
