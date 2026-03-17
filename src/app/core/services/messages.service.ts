@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { MessagesResponse } from '@core/models';
@@ -12,9 +12,9 @@ export interface ContactPayload {
 
 @Injectable({ providedIn: 'root' })
 export class MessagesService {
-  private base = `${environment.api.baseUrl}/messages`;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private base = `${environment.api.baseUrl}/messages`;
 
   // Public — submit contact form
   sendMessage(payload: ContactPayload): Observable<{ message: string }> {

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import {
@@ -22,8 +22,9 @@ import {
   providedIn: 'root',
 })
 export class AdminService {
+  private http = inject(HttpClient);
+
   private base = environment.api.baseUrl + '/admin';
-  constructor(private http: HttpClient) {}
 
   getAll(): Observable<PortfolioContent> {
     return this.http.get<PortfolioContent>(this.base + '/page-content');

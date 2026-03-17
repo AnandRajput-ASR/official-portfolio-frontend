@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -57,6 +57,16 @@ type ActiveTab =
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+  contentService = inject(ContentService);
+  private adminService = inject(AdminService);
+  auth = inject(AuthService);
+  private messagesService = inject(MessagesService);
+  resumeService = inject(ResumeService);
+  themeService = inject(ThemeService);
+  certBadge = inject(CertBadgeService);
+  private router = inject(Router);
+  private toast = inject(ToastService);
+
   content: PortfolioContent | null = null;
   sidebarOpen = false;
   activeTab: ActiveTab = 'hero';
@@ -137,18 +147,6 @@ export class DashboardComponent implements OnInit {
   // ── Settings freelance services (editable list) ───────────────────────────
   newFreelanceService = '';
 
-  constructor(
-    public contentService: ContentService,
-    private adminService: AdminService,
-    public auth: AuthService,
-    private messagesService: MessagesService,
-    public resumeService: ResumeService,
-    public themeService: ThemeService,
-    public certBadge: CertBadgeService,
-    private router: Router,
-    private toast: ToastService,
-  ) {}
-
   ngOnInit(): void {
     this.adminService.getAll().subscribe({
       next: (data) => {
@@ -210,11 +208,12 @@ export class DashboardComponent implements OnInit {
       case 'blog':
         this.blogEdit = JSON.parse(JSON.stringify(this.content.blogPosts || []));
         break;
-      case 'settings': // Deep merge with defaults so any missing nested keys are filled in
+      case 'settings': { // Deep merge with defaults so any missing nested keys are filled in
         const rawSettings = this.content.siteSettings || {};
         const defaults = this.defaultSettings();
         this.settingsEdit = this.mergeWithDefaults(defaults, rawSettings);
         break;
+      }
       case 'stats':
         this.statsEdit = JSON.parse(JSON.stringify(this.content.stats || []));
         break;

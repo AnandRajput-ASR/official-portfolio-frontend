@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -18,6 +18,14 @@ import { PortfolioContent } from '@core/models';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
+  contentService = inject(ContentService);
+  private messagesService = inject(MessagesService);
+  private router = inject(Router);
+  resumeService = inject(ResumeService);
+  themeService = inject(ThemeService);
+  langService = inject(LanguageService);
+  private loadingService = inject(LoadingService);
+
   content: PortfolioContent | null = null;
   loading = true;
   apiError = false;
@@ -52,16 +60,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   resumeGateOpen = false;
   resumeGateEmail = '';
   resumeGateError = '';
-
-  constructor(
-    public contentService: ContentService,
-    private messagesService: MessagesService,
-    private router: Router,
-    public resumeService: ResumeService,
-    public themeService: ThemeService,
-    public langService: LanguageService,
-    private loadingService: LoadingService,
-  ) {}
 
   ngOnInit(): void {
     this.loadingService.start('home-content');

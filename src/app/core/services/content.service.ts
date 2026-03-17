@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { PortfolioContent, SiteSettings, Testimonial } from '@core/models';
@@ -8,8 +8,9 @@ import { PortfolioContent, SiteSettings, Testimonial } from '@core/models';
   providedIn: 'root',
 })
 export class ContentService {
+  private http = inject(HttpClient);
+
   private base = environment.api.baseUrl + '/content';
-  constructor(private http: HttpClient) {}
 
   /** Resolve a stored image value to a full URL.
    *  Handles: /uploads/... paths (from new file storage) and legacy data: base64 */

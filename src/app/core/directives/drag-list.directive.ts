@@ -1,11 +1,4 @@
-import {
-  Directive,
-  Output,
-  EventEmitter,
-  HostListener,
-  ElementRef,
-  Renderer2,
-} from '@angular/core';
+import { Directive, Output, EventEmitter, HostListener, ElementRef, Renderer2, inject } from '@angular/core';
 
 /**
  * DragListDirective — attach to a container, each child with [draggable="true"]
@@ -17,14 +10,12 @@ import {
  */
 @Directive({ selector: '[appDragList]', standalone: true })
 export class DragListDirective {
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+
   @Output() reordered = new EventEmitter<string[]>();
 
   private dragSrcId: string | null = null;
-
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-  ) {}
 
   private getItems(): HTMLElement[] {
     return Array.from(this.el.nativeElement.querySelectorAll('[data-drag-id]'));
@@ -39,8 +30,8 @@ export class DragListDirective {
     e.dataTransfer!.effectAllowed = 'move';
   }
 
-  @HostListener('dragend', ['$event'])
-  onDragEnd(e: DragEvent) {
+  @HostListener('dragend')
+  onDragEnd() {
     this.getItems().forEach((el) => {
       this.renderer.removeClass(el, 'dragging');
       this.renderer.removeClass(el, 'drag-over');
