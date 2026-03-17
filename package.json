@@ -13,6 +13,8 @@
     "watch": "ng build --watch --configuration development",
     "lint": "eslint \"src/**/*.{ts,html}\"",
     "lint:fix": "eslint \"src/**/*.{ts,html}\" --fix",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+    "verify": "npm run lint && npm run build && npm run test:ci",
     "format": "prettier --write .",
     "prepare": "husky",
     "test": "ng test"
