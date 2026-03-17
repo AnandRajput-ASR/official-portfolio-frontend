@@ -725,6 +725,53 @@
             placeholder="Describe your experience working with Anand..."
           ></textarea>
         </div>
+
+        <!-- Star Rating -->
+        <div class="cform-group">
+          <label>Rating</label>
+          <div class="testi-rating-picker">
+            <button
+              type="button"
+              *ngFor="let n of [1, 2, 3, 4, 5]"
+              class="testi-star-btn"
+              [class.active]="testiSubmitForm.rating >= n"
+              (click)="setTestiRating(n)"
+            >
+              ★
+            </button>
+          </div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="cform-group">
+          <label>Your Photo <small>(optional)</small></label>
+          <div class="testi-photo-upload">
+            <div class="testi-photo-preview" *ngIf="testiSubmitAvatar">
+              <img [src]="testiSubmitAvatar" alt="preview" />
+            </div>
+            <div class="testi-photo-placeholder" *ngIf="!testiSubmitAvatar">
+              {{ testiSubmitForm.name ? testiSubmitForm.name.charAt(0).toUpperCase() : '?' }}
+            </div>
+            <label class="btn-photo-upload">
+              {{ testiSubmitAvatar ? 'Replace Photo' : 'Upload Photo' }}
+              <input
+                type="file"
+                accept="image/*"
+                style="display: none"
+                (change)="onTestiAvatarSelected($event)"
+              />
+            </label>
+            <button
+              type="button"
+              class="btn-photo-remove"
+              *ngIf="testiSubmitAvatar"
+              (click)="removeTestiAvatar()"
+            >
+              ✕ Remove
+            </button>
+          </div>
+        </div>
+
         <button
           class="btn-hero-primary"
           (click)="submitPublicTestimonial()"

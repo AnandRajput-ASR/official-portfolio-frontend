@@ -136,7 +136,7 @@ export class DashboardComponent implements OnInit {
   newFreelanceService = '';
 
   constructor(
-    private contentService: ContentService,
+    public contentService: ContentService,
     private adminService: AdminService,
     public auth: AuthService,
     private messagesService: MessagesService,
@@ -1043,7 +1043,7 @@ export class DashboardComponent implements OnInit {
     this.adminService.approveTestimonial(t.id).subscribe({
       next: (res) => {
         this.pendingTestimonials = this.pendingTestimonials.filter((p) => p.id !== t.id);
-        this.testimonialsEdit.push(res.data || t);
+        this.testimonialsEdit.push({ ...t, ...(res.data || {}) });
         this.toast.success(`Approved! "${t.name}" is now visible.`);
       },
       error: () => this.toast.error('Approve failed'),
