@@ -215,6 +215,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contentService.trackEvent('resumeDownload');
   }
 
+  trackSocialClick(): void {
+    this.contentService.trackEvent('socialClick');
+  }
+
   toggleBlogPost(id: string): void {
     this.activeBlogPost = this.activeBlogPost === id ? null : id;
   }

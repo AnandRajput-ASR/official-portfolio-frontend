@@ -247,7 +247,9 @@
         </p>
         <div class="about-links">
           <a [href]="'mailto:' + content.hero.email" class="alink">✉ {{ content.hero.email }}</a>
-          <a [href]="content.hero.linkedin" target="_blank" class="alink">🔗 LinkedIn Profile</a>
+          <a [href]="content.hero.linkedin" target="_blank" class="alink" (click)="trackSocialClick()"
+            >🔗 LinkedIn Profile</a
+          >
           <a href="#contact" class="btn-hero-primary" style="margin-top: 0.5rem"
             >Let's Work Together →</a
           >
@@ -925,14 +927,20 @@
               [title]="emailCopied ? 'Copied!' : 'Copy email'"
             >{{ emailCopied ? '✓' : '⧉' }}</button>
           </a>
-          <a [href]="content.hero.linkedin" target="_blank" class="clink">
+          <a [href]="content.hero.linkedin" target="_blank" class="clink" (click)="trackSocialClick()">
             <span class="clink-icon">🔗</span>
             <div>
               <p class="clink-label">LinkedIn</p>
               <p class="clink-val">Connect with me</p>
             </div>
           </a>
-          <a *ngIf="content.hero.github" [href]="content.hero.github" target="_blank" class="clink">
+          <a
+            *ngIf="content.hero.github"
+            [href]="content.hero.github"
+            target="_blank"
+            class="clink"
+            (click)="trackSocialClick()"
+          >
             <span class="clink-icon">⌥</span>
             <div>
               <p class="clink-label">GitHub</p>
@@ -1052,8 +1060,14 @@
       <p class="footer-copy">{{ content.siteSettings.footer.copy }}</p>
       <div class="footer-links">
         <a [href]="'mailto:' + content.hero.email">Email</a>
-        <a [href]="content.hero.linkedin" target="_blank">LinkedIn</a>
-        <a *ngIf="content.hero.github" [href]="content.hero.github" target="_blank">GitHub</a>
+        <a [href]="content.hero.linkedin" target="_blank" (click)="trackSocialClick()">LinkedIn</a>
+        <a
+          *ngIf="content.hero.github"
+          [href]="content.hero.github"
+          target="_blank"
+          (click)="trackSocialClick()"
+          >GitHub</a
+        >
       </div>
       <span class="footer-visitor-count" *ngIf="visitorCount !== null">
         👁 {{ visitorCount }} visitors this month

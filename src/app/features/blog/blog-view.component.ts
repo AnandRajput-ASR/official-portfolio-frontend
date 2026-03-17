@@ -373,6 +373,7 @@ export class BlogViewComponent implements OnInit {
         const found = content.blogPosts?.find((p) => p.slug === slug && p.published);
         if (found) {
           this.post = found;
+          this.contentService.trackEvent('blogView');
           // Fix #15: update browser tab title to article title
           this.titleService.setTitle(found.title + ' · ' + (content.hero?.name || 'Portfolio'));
         } else {
