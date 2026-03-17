@@ -1,4 +1,12 @@
-import { Directive, Output, EventEmitter, HostListener, ElementRef, Renderer2, inject } from '@angular/core';
+import {
+  Directive,
+  Output,
+  EventEmitter,
+  HostListener,
+  ElementRef,
+  Renderer2,
+  inject,
+} from '@angular/core';
 
 /**
  * DragListDirective — attach to a container, each child with [draggable="true"]

@@ -208,7 +208,8 @@ export class DashboardComponent implements OnInit {
       case 'blog':
         this.blogEdit = JSON.parse(JSON.stringify(this.content.blogPosts || []));
         break;
-      case 'settings': { // Deep merge with defaults so any missing nested keys are filled in
+      case 'settings': {
+        // Deep merge with defaults so any missing nested keys are filled in
         const rawSettings = this.content.siteSettings || {};
         const defaults = this.defaultSettings();
         this.settingsEdit = this.mergeWithDefaults(defaults, rawSettings);
@@ -1304,7 +1305,8 @@ export class DashboardComponent implements OnInit {
     for (const d of this.analytics?.dailyVisits ?? []) map.set(d.date, d.count);
     const bars: { date: string; count: number; label: string }[] = [];
     for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
+      const d = new Date();
+      d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       bars.push({ date: key, count: map.get(key) ?? 0, label });
@@ -1312,7 +1314,7 @@ export class DashboardComponent implements OnInit {
     return bars;
   }
   visitChartMax(): number {
-    return Math.max(1, ...this.visitChartBars().map(b => b.count));
+    return Math.max(1, ...this.visitChartBars().map((b) => b.count));
   }
   /** Returns a +/- delta string vs last month. */
   monthDelta(): string {
@@ -1320,7 +1322,7 @@ export class DashboardComponent implements OnInit {
     const prev = this.analytics?.lastMonth ?? 0;
     if (!prev) return cur > 0 ? '+' + cur + ' new' : '—';
     const diff = cur - prev;
-    const pct = Math.round(Math.abs(diff) / prev * 100);
+    const pct = Math.round((Math.abs(diff) / prev) * 100);
     return (diff >= 0 ? '+' : '') + diff + ' (' + (diff >= 0 ? '+' : '') + pct + '% vs last month)';
   }
   today(): string {
@@ -1560,7 +1562,9 @@ export class DashboardComponent implements OnInit {
     const reorder = (arr: any[]) => {
       const map: Record<string, number> = {};
       orderPayload.forEach((o) => (map[o.id] = o.displayOrder));
-      const sorted = [...arr].sort((a, b) => (map[a.id] ?? a.displayOrder) - (map[b.id] ?? b.displayOrder));
+      const sorted = [...arr].sort(
+        (a, b) => (map[a.id] ?? a.displayOrder) - (map[b.id] ?? b.displayOrder),
+      );
       // Sync the displayOrder property so Save All sends the correct values
       sorted.forEach((item, idx) => (item.displayOrder = idx));
       return sorted;

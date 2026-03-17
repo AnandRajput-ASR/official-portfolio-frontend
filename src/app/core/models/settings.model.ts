@@ -73,6 +73,6 @@ export interface SiteSettings {
   /** Public visitor counter shown in the footer. */
   visitorCount: {
     show: boolean;
-    threshold: number;  // only display publicly once this many visits recorded
+    threshold: number; // only display publicly once this many visits recorded
   };
 }

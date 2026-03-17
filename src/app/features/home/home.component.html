@@ -61,7 +61,9 @@
         (click)="langService.toggle()"
         title="Switch language"
         aria-label="Toggle language"
-      >{{ langService.label() }}</button>
+      >
+        {{ langService.label() }}
+      </button>
 
       <!-- Resume quick link -->
       <a
@@ -111,7 +113,11 @@
           (click)="handleResumeClick($event)"
           >↓ Download Resume</a
         >
-        <button class="theme-toggle-lg" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <button
+          class="theme-toggle-lg"
+          (click)="themeService.toggle()"
+          [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        >
           {{ themeService.isDark() ? '☀️ Light Mode' : '🌙 Dark Mode' }}
         </button>
       </div>
@@ -242,12 +248,16 @@
             content.siteSettings.freelance.showInAbout !== false
           "
         >
-          💼 <strong>Available for freelance.</strong> Angular SPA, cloud integrations, CI/CD
-          setup, Node.js APIs — let's talk.
+          💼 <strong>Available for freelance.</strong> Angular SPA, cloud integrations, CI/CD setup,
+          Node.js APIs — let's talk.
         </p>
         <div class="about-links">
           <a [href]="'mailto:' + content.hero.email" class="alink">✉ {{ content.hero.email }}</a>
-          <a [href]="content.hero.linkedin" target="_blank" class="alink" (click)="trackSocialClick()"
+          <a
+            [href]="content.hero.linkedin"
+            target="_blank"
+            class="alink"
+            (click)="trackSocialClick()"
             >🔗 LinkedIn Profile</a
           >
           <a href="#contact" class="btn-hero-primary" style="margin-top: 0.5rem"
@@ -413,8 +423,8 @@
       <p class="section-label">// Personal & Freelance</p>
       <h2 class="section-title">Side Projects</h2>
       <p class="section-sub">
-        Hobby builds, freelance work, and open-source contributions — things I make because I
-        enjoy building.
+        Hobby builds, freelance work, and open-source contributions — things I make because I enjoy
+        building.
       </p>
     </div>
 
@@ -602,7 +612,11 @@
             class="cert-badge cert-badge-uploaded"
             *ngIf="cert.badgeType === 'upload' && cert.badgeLink"
           >
-            <img [src]="contentService.getImageUrl(cert.badgeLink)" [alt]="cert.name" loading="lazy" />
+            <img
+              [src]="contentService.getImageUrl(cert.badgeLink)"
+              [alt]="cert.name"
+              loading="lazy"
+            />
           </div>
         </div>
 
@@ -744,7 +758,12 @@
 
         <div class="cform-group">
           <label>{{ langService.t('testi.email') }}</label
-          ><input type="email" [(ngModel)]="testiSubmitForm.email" [placeholder]="langService.t('testi.emailPlaceholder')" required />
+          ><input
+            type="email"
+            [(ngModel)]="testiSubmitForm.email"
+            [placeholder]="langService.t('testi.emailPlaceholder')"
+            required
+          />
         </div>
 
         <!-- Star Rating -->
@@ -831,9 +850,7 @@
         <p class="blog-excerpt">{{ post.excerpt }}</p>
         <div class="blog-footer">
           <span class="blog-date">{{ post.publishedAt | date: 'MMM d, yyyy' }}</span>
-          <button class="blog-read-btn" (click)="navigateToBlog(post.slug)">
-            Read Article →
-          </button>
+          <button class="blog-read-btn" (click)="navigateToBlog(post.slug)">Read Article →</button>
         </div>
       </article>
     </div>
@@ -915,19 +932,31 @@
           "
         ></h2>
         <div class="contact-links">
-          <a [href]="'mailto:' + content.hero.email" class="clink" target="_blank" style="flex:1">
+          <a [href]="'mailto:' + content.hero.email" class="clink" target="_blank" style="flex: 1">
             <span class="clink-icon">✉</span>
-            <div style="flex:1;min-width:0">
+            <div style="flex: 1; min-width: 0">
               <p class="clink-label">Email</p>
-              <p class="clink-val" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ content.hero.email }}</p>
+              <p
+                class="clink-val"
+                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+              >
+                {{ content.hero.email }}
+              </p>
             </div>
             <button
               class="clink-copy-inline"
               (click)="copyEmail(); $event.preventDefault(); $event.stopPropagation()"
               [title]="emailCopied ? 'Copied!' : 'Copy email'"
-            >{{ emailCopied ? '✓' : '⧉' }}</button>
+            >
+              {{ emailCopied ? '✓' : '⧉' }}
+            </button>
           </a>
-          <a [href]="content.hero.linkedin" target="_blank" class="clink" (click)="trackSocialClick()">
+          <a
+            [href]="content.hero.linkedin"
+            target="_blank"
+            class="clink"
+            (click)="trackSocialClick()"
+          >
             <span class="clink-icon">🔗</span>
             <div>
               <p class="clink-label">LinkedIn</p>
@@ -1012,8 +1041,17 @@
             ></textarea>
           </div>
           <!-- Honeypot: hidden from real users; bots fill it and get silently discarded -->
-          <div style="position:absolute;left:-9999px;height:0;overflow:hidden;" aria-hidden="true">
-            <input type="text" name="_hp" [(ngModel)]="contactForm._hp" tabindex="-1" autocomplete="off" />
+          <div
+            style="position: absolute; left: -9999px; height: 0; overflow: hidden"
+            aria-hidden="true"
+          >
+            <input
+              type="text"
+              name="_hp"
+              [(ngModel)]="contactForm._hp"
+              tabindex="-1"
+              autocomplete="off"
+            />
           </div>
           <button
             class="btn-hero-primary"
@@ -1078,8 +1116,13 @@
 
 <!-- ═══ RESUME GATE MODAL ═══════════════════════════════════════════════════ -->
 <div class="resume-gate-overlay" *ngIf="resumeGateOpen" (click)="closeResumeGate()">
-  <div class="resume-gate-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="rg-title">
-
+  <div
+    class="resume-gate-modal"
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="rg-title"
+  >
     <!-- Close -->
     <button class="rg-close" (click)="closeResumeGate()" aria-label="Close">&times;</button>
 

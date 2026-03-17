@@ -10,8 +10,8 @@ export const SUPPORTED_LANGS: Lang[] = ['en', 'hi', 'jp'];
 
 export const LANG_LABELS: Record<Lang, string> = {
   en: 'EN',
-  hi: '\u0939\u093f',  // à¤¹à¤¿
-  jp: '\u65e5',        // æ—¥
+  hi: '\u0939\u093f', // à¤¹à¤¿
+  jp: '\u65e5', // æ—¥
 };
 
 @Injectable({ providedIn: 'root' })
@@ -84,19 +84,17 @@ export class LanguageService {
       this.translations.set(this.cache[lang]!);
       return;
     }
-    this.http
-      .get<Record<string, string>>(`/assets/i18n/${lang}.json`)
-      .subscribe({
-        next: (data) => {
-          this.cache[lang] = data;
-          // Only apply if this lang is still active (user didn't toggle away)
-          if (this.lang() === lang) this.translations.set(data);
-        },
-        error: () => {
-          // Fallback: if the JSON fails to load, try English
-          if (lang !== 'en') this.loadFallbackToEnglish();
-        },
-      });
+    this.http.get<Record<string, string>>(`/assets/i18n/${lang}.json`).subscribe({
+      next: (data) => {
+        this.cache[lang] = data;
+        // Only apply if this lang is still active (user didn't toggle away)
+        if (this.lang() === lang) this.translations.set(data);
+      },
+      error: () => {
+        // Fallback: if the JSON fails to load, try English
+        if (lang !== 'en') this.loadFallbackToEnglish();
+      },
+    });
   }
 
   private loadFallbackToEnglish(): void {
@@ -104,9 +102,12 @@ export class LanguageService {
       this.translations.set(this.cache['en']!);
       return;
     }
-    this.http
-      .get<Record<string, string>>('/assets/i18n/en.json')
-      .subscribe({ next: (data) => { this.cache['en'] = data; this.translations.set(data); } });
+    this.http.get<Record<string, string>>('/assets/i18n/en.json').subscribe({
+      next: (data) => {
+        this.cache['en'] = data;
+        this.translations.set(data);
+      },
+    });
   }
 
   private getSavedLang(): Lang {

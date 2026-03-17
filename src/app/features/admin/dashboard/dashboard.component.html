@@ -24,7 +24,11 @@
       <span></span><span></span><span></span>
     </button>
     <span class="mob-logo">&lt;ADMIN /&gt;</span>
-    <button class="mob-theme-btn" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+    <button
+      class="mob-theme-btn"
+      (click)="themeService.toggle()"
+      [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+    >
       {{ themeService.isDark() ? '☀️' : '🌙' }}
     </button>
   </div>
@@ -95,7 +99,11 @@
     </nav>
 
     <div class="sidebar-footer">
-      <button class="theme-btn" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+      <button
+        class="theme-btn"
+        (click)="themeService.toggle()"
+        [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      >
         <span>{{ themeService.isDark() ? '☀️' : '🌙' }}</span>
         {{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}
       </button>
@@ -596,7 +604,12 @@
           <div class="testi-admin-topbar">
             <span class="drag-handle"></span>
             <div class="testi-avatar-sm" *ngIf="!t.avatar">{{ t.name.charAt(0) }}</div>
-            <img class="testi-avatar-sm-img" *ngIf="t.avatar" [src]="contentService.getImageUrl(t.avatar)" [alt]="t.name" />
+            <img
+              class="testi-avatar-sm-img"
+              *ngIf="t.avatar"
+              [src]="contentService.getImageUrl(t.avatar)"
+              [alt]="t.name"
+            />
             <div class="testi-admin-name">
               <strong>{{ t.name }}</strong>
               <span class="muted-text">{{ t.role }} · {{ t.company }}</span>
@@ -687,7 +700,12 @@
           <div class="pending-card" *ngFor="let p of pendingTestimonials; trackBy: trackById">
             <div class="pending-header">
               <div class="testi-avatar-sm" *ngIf="!p.avatar">{{ p.name.charAt(0) }}</div>
-              <img class="testi-avatar-sm-img" *ngIf="p.avatar" [src]="contentService.getImageUrl(p.avatar)" [alt]="p.name" />
+              <img
+                class="testi-avatar-sm-img"
+                *ngIf="p.avatar"
+                [src]="contentService.getImageUrl(p.avatar)"
+                [alt]="p.name"
+              />
               <div>
                 <strong>{{ p.name }}</strong>
                 <span class="muted-text" *ngIf="p.role || p.company">
@@ -860,8 +878,12 @@
             <div class="ac-label">Page Views</div>
             <div class="ac-sublabel" *ngIf="analytics.thisMonth !== undefined">
               {{ analytics.thisMonth }} this month
-              <span *ngIf="analytics.lastMonth !== undefined && analytics.lastMonth > 0"
-                    [style.color]="analytics.thisMonth >= analytics.lastMonth ? 'var(--green)' : '#ef4444'">
+              <span
+                *ngIf="analytics.lastMonth !== undefined && analytics.lastMonth > 0"
+                [style.color]="
+                  analytics.thisMonth >= analytics.lastMonth ? 'var(--green)' : '#ef4444'
+                "
+              >
                 &nbsp;{{ monthDelta() }}
               </span>
             </div>
@@ -889,7 +911,7 @@
         </div>
 
         <!-- 30-day visits chart -->
-        <div class="analytics-section" style="margin-top:1.5rem">
+        <div class="analytics-section" style="margin-top: 1.5rem">
           <h3 class="analytics-section-title">Page Visits — Last 30 Days</h3>
           <div class="visit-chart" *ngIf="visitChartBars().length > 0; else noVisits">
             <div class="vc-bars">
@@ -913,7 +935,9 @@
             </div>
           </div>
           <ng-template #noVisits>
-            <p class="muted-text" style="font-size:0.82rem;padding:1rem 0">No visit data yet — visits will appear here as people view the portfolio.</p>
+            <p class="muted-text" style="font-size: 0.82rem; padding: 1rem 0">
+              No visit data yet — visits will appear here as people view the portfolio.
+            </p>
           </ng-template>
         </div>
 
@@ -1197,15 +1221,21 @@
           </div>
         </div>
         <div class="form-group" style="margin-top: 0.75rem">
-          <label>🌐 Site URL <small>(used in robots.txt &amp; sitemap.xml — no redeploy needed)</small></label>
+          <label
+            >🌐 Site URL
+            <small>(used in robots.txt &amp; sitemap.xml — no redeploy needed)</small></label
+          >
           <input
             type="url"
             [(ngModel)]="settingsEdit.siteUrl"
             (ngModelChange)="markDirty()"
             placeholder="https://anandrajput.dev"
           />
-          <small style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block">
-            Changing this updates <code>/robots.txt</code> and <code>/sitemap.xml</code> instantly without redeploying.
+          <small
+            style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block"
+          >
+            Changing this updates <code>/robots.txt</code> and <code>/sitemap.xml</code> instantly
+            without redeploying.
           </small>
         </div>
 
@@ -1219,7 +1249,9 @@
               (ngModelChange)="markDirty()"
             /><span class="big-toggle-slider"></span>
           </label>
-          <small style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block">
+          <small
+            style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block"
+          >
             When enabled, visitors must enter their email address before the resume PDF downloads.
           </small>
         </div>
@@ -1228,31 +1260,63 @@
       <!-- Language Toggle -->
       <div class="settings-card" style="margin-top: 1.25rem">
         <h3 style="margin-bottom: 0.35rem">🌐 Language Toggle</h3>
-        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem">Check the languages you want visitors to see. The toggle button is hidden automatically when only one language is enabled.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem">
-          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+        <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem">
+          Check the languages you want visitors to see. The toggle button is hidden automatically
+          when only one language is enabled.
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              cursor: pointer;
+              font-size: 0.88rem;
+            "
+          >
             <input
               type="checkbox"
               [checked]="settingsEdit.enabledLanguages.includes('en')"
               (change)="toggleLang('en'); markDirty()"
-            /> English (EN)
+            />
+            English (EN)
           </label>
-          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              cursor: pointer;
+              font-size: 0.88rem;
+            "
+          >
             <input
               type="checkbox"
               [checked]="settingsEdit.enabledLanguages.includes('hi')"
               (change)="toggleLang('hi'); markDirty()"
-            /> हिन्दी (HI)
+            />
+            हिन्दी (HI)
           </label>
-          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              cursor: pointer;
+              font-size: 0.88rem;
+            "
+          >
             <input
               type="checkbox"
               [checked]="settingsEdit.enabledLanguages.includes('jp')"
               (change)="toggleLang('jp'); markDirty()"
-            /> 日本語 (JP)
+            />
+            日本語 (JP)
           </label>
         </div>
-        <small style="color:var(--muted);font-size:0.72rem;margin-top:0.6rem;display:block">English cannot be removed — it is the fallback language.</small>
+        <small style="color: var(--muted); font-size: 0.72rem; margin-top: 0.6rem; display: block"
+          >English cannot be removed — it is the fallback language.</small
+        >
       </div>
 
       <!-- Currently Learning -->
@@ -1269,14 +1333,33 @@
           </label>
         </div>
         <div *ngIf="settingsEdit.learning.enabled" style="margin-top: 1rem">
-          <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem">Each item shows as a chip near the footer. Type is displayed as a tag (book / course / tech / other).</p>
+          <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem">
+            Each item shows as a chip near the footer. Type is displayed as a tag (book / course /
+            tech / other).
+          </p>
           <div
             *ngFor="let item of settingsEdit.learning.items; let i = index; trackBy: trackByIndex"
             class="form-row"
-            style="align-items:flex-end;gap:0.5rem;margin-bottom:0.5rem"
+            style="align-items: flex-end; gap: 0.5rem; margin-bottom: 0.5rem"
           >
-            <div class="form-group xs"><label>Icon</label><input type="text" [(ngModel)]="item.icon" (ngModelChange)="markDirty()" placeholder="📚" /></div>
-            <div class="form-group"><label>Label</label><input type="text" [(ngModel)]="item.label" (ngModelChange)="markDirty()" placeholder="Designing Distributed Systems" /></div>
+            <div class="form-group xs">
+              <label>Icon</label
+              ><input
+                type="text"
+                [(ngModel)]="item.icon"
+                (ngModelChange)="markDirty()"
+                placeholder="📚"
+              />
+            </div>
+            <div class="form-group">
+              <label>Label</label
+              ><input
+                type="text"
+                [(ngModel)]="item.label"
+                (ngModelChange)="markDirty()"
+                placeholder="Designing Distributed Systems"
+              />
+            </div>
             <div class="form-group xs">
               <label>Type</label>
               <select [(ngModel)]="item.type" (ngModelChange)="markDirty()">
@@ -1286,13 +1369,33 @@
                 <option value="other">other</option>
               </select>
             </div>
-            <div class="form-group"><label>URL (opt)</label><input type="url" [(ngModel)]="item.url" (ngModelChange)="markDirty()" placeholder="https://..." /></div>
-            <button class="btn-icon-danger" (click)="settingsEdit.learning.items.splice(i,1); markDirty()" title="Remove" style="margin-bottom:0.1rem">✕</button>
+            <div class="form-group">
+              <label>URL (opt)</label
+              ><input
+                type="url"
+                [(ngModel)]="item.url"
+                (ngModelChange)="markDirty()"
+                placeholder="https://..."
+              />
+            </div>
+            <button
+              class="btn-icon-danger"
+              (click)="settingsEdit.learning.items.splice(i, 1); markDirty()"
+              title="Remove"
+              style="margin-bottom: 0.1rem"
+            >
+              ✕
+            </button>
           </div>
           <button
             class="btn-add"
-            (click)="settingsEdit.learning.items.push({ label: '', icon: '📖', type: 'other' }); markDirty()"
-          >+ Add Item</button>
+            (click)="
+              settingsEdit.learning.items.push({ label: '', icon: '📖', type: 'other' });
+              markDirty()
+            "
+          >
+            + Add Item
+          </button>
         </div>
       </div>
 
@@ -1301,17 +1404,29 @@
         <div class="settings-card-header">
           <div>
             <h3>👁 Public Visitor Counter</h3>
-            <p>Show "X visitors this month" in the portfolio footer. Only appears once the threshold is reached.</p>
+            <p>
+              Show "X visitors this month" in the portfolio footer. Only appears once the threshold
+              is reached.
+            </p>
           </div>
           <label class="big-toggle">
-            <input type="checkbox" [(ngModel)]="settingsEdit.visitorCount.show" (ngModelChange)="markDirty()" />
+            <input
+              type="checkbox"
+              [(ngModel)]="settingsEdit.visitorCount.show"
+              (ngModelChange)="markDirty()"
+            />
             <span class="big-toggle-slider"></span>
           </label>
         </div>
-        <div class="form-row" style="margin-top:1rem" *ngIf="settingsEdit.visitorCount.show">
+        <div class="form-row" style="margin-top: 1rem" *ngIf="settingsEdit.visitorCount.show">
           <div class="form-group xs">
             <label>Show after <small>(min visits)</small></label>
-            <input type="number" min="0" [(ngModel)]="settingsEdit.visitorCount.threshold" (ngModelChange)="markDirty()" />
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="settingsEdit.visitorCount.threshold"
+              (ngModelChange)="markDirty()"
+            />
           </div>
         </div>
       </div>

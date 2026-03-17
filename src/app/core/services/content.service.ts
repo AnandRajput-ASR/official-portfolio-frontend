@@ -46,14 +46,12 @@ export class ContentService {
 
   /** Record a resume-gate lead. Fire-and-forget — never blocks the download. */
   trackResumeLead(email: string): void {
-    this.http
-      .post(this.base + '/resume-lead', { email })
-      .subscribe({ error: () => {} });
+    this.http.post(this.base + '/resume-lead', { email }).subscribe({ error: () => {} });
   }
 
   getVisitorCount(): Observable<{ thisMonth: number; lastMonth: number }> {
     return this.http.get<{ thisMonth: number; lastMonth: number }>(
-      this.base + '/analytics/visitor-count'
+      this.base + '/analytics/visitor-count',
     );
   }
 

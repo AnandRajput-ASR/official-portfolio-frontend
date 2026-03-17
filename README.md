@@ -6,14 +6,14 @@ A modern, production-ready **Angular 20** single-page application that serves as
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Angular 20.3 |
-| Language | TypeScript 5.9 (strict mode) |
-| Styling | SCSS (component-scoped) |
-| Reactive | RxJS 7.8 + Angular Signals |
-| Linting | ESLint 9 + angular-eslint + Prettier 3 |
-| Git Hooks | Husky + lint-staged |
+| Layer     | Technology                             |
+| --------- | -------------------------------------- |
+| Framework | Angular 20.3                           |
+| Language  | TypeScript 5.9 (strict mode)           |
+| Styling   | SCSS (component-scoped)                |
+| Reactive  | RxJS 7.8 + Angular Signals             |
+| Linting   | ESLint 9 + angular-eslint + Prettier 3 |
+| Git Hooks | Husky + lint-staged                    |
 
 ---
 
@@ -107,24 +107,24 @@ official-portfolio-frontend/
 
 Configured in `tsconfig.json` for clean imports:
 
-| Alias | Maps To | Example |
-|---|---|---|
-| `@core/*` | `src/app/core/*` | `import { AuthService } from '@core/services/auth.service'` |
-| `@shared/*` | `src/app/shared/*` | `import { ... } from '@shared/components/...'` |
+| Alias         | Maps To              | Example                                                         |
+| ------------- | -------------------- | --------------------------------------------------------------- |
+| `@core/*`     | `src/app/core/*`     | `import { AuthService } from '@core/services/auth.service'`     |
+| `@shared/*`   | `src/app/shared/*`   | `import { ... } from '@shared/components/...'`                  |
 | `@features/*` | `src/app/features/*` | `import { HomeComponent } from '@features/home/home.component'` |
-| `@env/*` | `src/environments/*` | `import { environment } from '@env/environment'` |
+| `@env/*`      | `src/environments/*` | `import { environment } from '@env/environment'`                |
 
 ---
 
 ## Routes
 
-| Path | Component | Guard | Description |
-|---|---|---|---|
-| `/` | `HomeComponent` | — | Main portfolio page |
-| `/blog/:slug` | `BlogViewComponent` | — | Individual blog post |
-| `/admin/dashboard` | `DashboardComponent` | `authGuard` | Admin panel (JWT required) |
-| `/:slug` | `LoginComponent` | `secretSlugGuard` | Secret admin login URL |
-| `**` | — | — | Redirects to `/` |
+| Path               | Component            | Guard             | Description                |
+| ------------------ | -------------------- | ----------------- | -------------------------- |
+| `/`                | `HomeComponent`      | —                 | Main portfolio page        |
+| `/blog/:slug`      | `BlogViewComponent`  | —                 | Individual blog post       |
+| `/admin/dashboard` | `DashboardComponent` | `authGuard`       | Admin panel (JWT required) |
+| `/:slug`           | `LoginComponent`     | `secretSlugGuard` | Secret admin login URL     |
+| `**`               | —                    | —                 | Redirects to `/`           |
 
 All feature components are **lazy-loaded** via dynamic `import()`.
 
@@ -190,16 +190,16 @@ Output: `dist/official-portfolio-frontend/` — deploy to any static hosting.
 
 ## Available Scripts
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start dev server with auto-open |
-| `npm start` | Start dev server |
-| `npm run build` | Production build |
-| `npm run watch` | Build in watch mode |
-| `npm run lint` | Run ESLint on all `.ts` and `.html` files |
-| `npm run lint:fix` | Auto-fix lint errors |
-| `npm run format` | Format all files with Prettier |
-| `npm test` | Run unit tests (Karma + Jasmine) |
+| Command            | Description                               |
+| ------------------ | ----------------------------------------- |
+| `npm run dev`      | Start dev server with auto-open           |
+| `npm start`        | Start dev server                          |
+| `npm run build`    | Production build                          |
+| `npm run watch`    | Build in watch mode                       |
+| `npm run lint`     | Run ESLint on all `.ts` and `.html` files |
+| `npm run lint:fix` | Auto-fix lint errors                      |
+| `npm run format`   | Format all files with Prettier            |
+| `npm test`         | Run unit tests (Karma + Jasmine)          |
 
 ---
 
@@ -215,16 +215,16 @@ The admin panel is protected by two layers:
 
 ## Architecture Decisions
 
-| Decision | Rationale |
-|---|---|
-| **Standalone components** | No NgModules — simpler, tree-shakeable, Angular 20 default |
-| **Lazy-loaded routes** | Dashboard (~220 KB) and home (~120 KB) load on demand |
-| **Functional interceptor** | `HttpInterceptorFn` — modern pattern, no class boilerplate |
+| Decision                   | Rationale                                                                  |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **Standalone components**  | No NgModules — simpler, tree-shakeable, Angular 20 default                 |
+| **Lazy-loaded routes**     | Dashboard (~220 KB) and home (~120 KB) load on demand                      |
+| **Functional interceptor** | `HttpInterceptorFn` — modern pattern, no class boilerplate                 |
 | **Per-domain model files** | 14 focused files vs one monolithic model — easier to navigate and maintain |
-| **Path aliases** | `@core/`, `@shared/`, `@features/`, `@env/` — no `../../../` imports |
-| **Strict TypeScript** | `strict: true` + `strictTemplates` — catches bugs at compile time |
-| **Component-scoped SCSS** | Styles are encapsulated per component, no global CSS conflicts |
-| **Signals for theme** | `ThemeService` uses Angular Signals for reactive theme state |
+| **Path aliases**           | `@core/`, `@shared/`, `@features/`, `@env/` — no `../../../` imports       |
+| **Strict TypeScript**      | `strict: true` + `strictTemplates` — catches bugs at compile time          |
+| **Component-scoped SCSS**  | Styles are encapsulated per component, no global CSS conflicts             |
+| **Signals for theme**      | `ThemeService` uses Angular Signals for reactive theme state               |
 
 ---
 

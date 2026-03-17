@@ -1,5 +1,5 @@
 export interface DailyVisit {
-  date: string;  // 'YYYY-MM-DD'
+  date: string; // 'YYYY-MM-DD'
   count: number;
 }
 
