@@ -48,7 +48,8 @@
   z-index: 500;
   background: #1a1200;
   border-top: 2px solid var(--amber);
-  padding: 0.55rem 2rem;
+  padding: 1rem;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -56,7 +57,7 @@
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   color: var(--amber);
-  animation: db-slide 0.2s ease;
+  width: min(540px, calc(100vw - 2rem));
   span {
     opacity: 0.85;
   }
@@ -431,6 +432,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
   backdrop-filter: blur(4px);
 }
 
@@ -438,7 +441,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 2rem;
-  width: 540px;
+  width: min(540px, calc(100vw - 2rem));
   max-height: 85vh;
   overflow-y: auto;
   clip-path: polygon(
@@ -1893,11 +1896,35 @@
 }
 
 .modal-wide {
+  width: min(680px, calc(100vw - 2rem));
   max-width: 680px !important;
 }
+
+.cert-meta-row {
+  grid-template-columns: 1fr 1fr 110px 110px;
+  align-items: end;
+
+  .form-group.xs {
+    max-width: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .cert-meta-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .cert-meta-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form-group.sm {
   max-width: 140px;
 }
+
 .form-group.xs {
   max-width: 90px;
 }
