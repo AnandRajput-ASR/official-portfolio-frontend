@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Testimonial submission form
   testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
+  testiSubmitAvatar: string | null = null;
   testiSubmitting = false;
   testiSubmitSuccess = false;
   testiSubmitError = '';
@@ -119,11 +120,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.testiSubmitting = true;
     this.testiSubmitError = '';
-    this.contentService.submitTestimonial(this.testiSubmitForm).subscribe({
+    const payload = { ...this.testiSubmitForm, avatar: this.testiSubmitAvatar || undefined };
+    this.contentService.submitTestimonial(payload).subscribe({
       next: () => {
         this.testiSubmitting = false;
         this.testiSubmitSuccess = true;
         this.testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
+        this.testiSubmitAvatar = null;
         setTimeout(() => {
           this.testiSubmitSuccess = false;
           this.showTestiSubmitForm = false;
@@ -134,6 +137,29 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.testiSubmitError = err.error?.message || 'Submission failed. Please try again.';
       },
     });
+  }
+
+  onTestiAvatarSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (file.size > 2 * 1024 * 1024) {
+      this.testiSubmitError = 'Photo must be under 2 MB.';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.testiSubmitAvatar = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeTestiAvatar(): void {
+    this.testiSubmitAvatar = null;
+  }
+
+  setTestiRating(n: number): void {
+    this.testiSubmitForm.rating = n;
   }
 
   toggleMobileMenu(): void {

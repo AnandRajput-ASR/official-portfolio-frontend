@@ -595,7 +595,8 @@
         >
           <div class="testi-admin-topbar">
             <span class="drag-handle"></span>
-            <div class="testi-avatar-sm">{{ t.name.charAt(0) }}</div>
+            <div class="testi-avatar-sm" *ngIf="!t.avatar">{{ t.name.charAt(0) }}</div>
+            <img class="testi-avatar-sm-img" *ngIf="t.avatar" [src]="contentService.getImageUrl(t.avatar)" [alt]="t.name" />
             <div class="testi-admin-name">
               <strong>{{ t.name }}</strong>
               <span class="muted-text">{{ t.role }} · {{ t.company }}</span>
@@ -643,7 +644,7 @@
                 <label>Avatar Photo <small>(optional)</small></label>
                 <div class="avatar-upload-row">
                   <div class="testi-avatar-preview" *ngIf="t.avatar">
-                    <img [src]="t.avatar" alt="avatar" />
+                    <img [src]="contentService.getImageUrl(t.avatar)" alt="avatar" />
                   </div>
                   <label class="btn btn-outline btn-xs">
                     {{ t.avatar ? 'Replace Photo' : 'Upload Photo' }}
@@ -685,7 +686,8 @@
         <div class="pending-list" *ngIf="pendingTestimonials.length > 0">
           <div class="pending-card" *ngFor="let p of pendingTestimonials; trackBy: trackById">
             <div class="pending-header">
-              <div class="testi-avatar-sm">{{ p.name.charAt(0) }}</div>
+              <div class="testi-avatar-sm" *ngIf="!p.avatar">{{ p.name.charAt(0) }}</div>
+              <img class="testi-avatar-sm-img" *ngIf="p.avatar" [src]="contentService.getImageUrl(p.avatar)" [alt]="p.name" />
               <div>
                 <strong>{{ p.name }}</strong>
                 <span class="muted-text" *ngIf="p.role || p.company">
