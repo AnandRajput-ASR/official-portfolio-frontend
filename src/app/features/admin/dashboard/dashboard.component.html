@@ -861,7 +861,7 @@
             <div class="ac-sublabel" *ngIf="analytics.thisMonth !== undefined">
               {{ analytics.thisMonth }} this month
               <span *ngIf="analytics.lastMonth !== undefined && analytics.lastMonth > 0"
-                    [style.color]="(analytics.thisMonth ?? 0) >= (analytics.lastMonth ?? 0) ? 'var(--green)' : '#ef4444'">
+                    [style.color]="analytics.thisMonth >= analytics.lastMonth ? 'var(--green)' : '#ef4444'">
                 &nbsp;{{ monthDelta() }}
               </span>
             </div>
@@ -1233,21 +1233,21 @@
           <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
             <input
               type="checkbox"
-              [checked]="settingsEdit.enabledLanguages?.includes('en')"
+              [checked]="settingsEdit.enabledLanguages.includes('en')"
               (change)="toggleLang('en'); markDirty()"
             /> English (EN)
           </label>
           <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
             <input
               type="checkbox"
-              [checked]="settingsEdit.enabledLanguages?.includes('hi')"
+              [checked]="settingsEdit.enabledLanguages.includes('hi')"
               (change)="toggleLang('hi'); markDirty()"
             /> हिन्दी (HI)
           </label>
           <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
             <input
               type="checkbox"
-              [checked]="settingsEdit.enabledLanguages?.includes('jp')"
+              [checked]="settingsEdit.enabledLanguages.includes('jp')"
               (change)="toggleLang('jp'); markDirty()"
             /> 日本語 (JP)
           </label>
@@ -2652,7 +2652,7 @@
         ><input type="text" [(ngModel)]="newCert.code" placeholder="AZ-204" maxlength="12" />
       </div>
     </div>
-    <div class="form-row">
+    <div class="form-row cert-meta-row">
       <div class="form-group">
         <label>Issuer</label>
         <select
