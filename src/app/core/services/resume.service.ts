@@ -6,6 +6,7 @@ import { environment } from '@env/environment';
 export interface ResumeInfo {
   available: boolean;
   fileName?: string;
+  downloadName?: string;
   uploadedAt?: string;
   size?: number;
 }
@@ -29,6 +30,10 @@ export class ResumeService {
 
   getDownloadUrl(): string {
     return `${this.base}/download`;
+  }
+
+  updateDownloadName(downloadName: string): Observable<any> {
+    return this.http.patch(`${this.base}/download-name`, { downloadName });
   }
 
   /**
