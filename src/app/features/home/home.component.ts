@@ -395,7 +395,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.resumeGateError = 'Please enter a valid email address.';
       return;
     }
-    // Track it as a contact event so admin can see in analytics, then start download
+    // Send the email to the backend (stored in resume_leads + email notification)
+    this.contentService.trackResumeLead(email);
+    // Track it as a resumeDownload analytics event
     this.contentService.trackEvent('resumeDownload');
     this.resumeGateOpen = false;
     // Trigger download programmatically
