@@ -43,6 +43,13 @@ export class ContentService {
       .subscribe({ error: () => {} });
   }
 
+  /** Record a resume-gate lead. Fire-and-forget — never blocks the download. */
+  trackResumeLead(email: string): void {
+    this.http
+      .post(this.base + '/resume-lead', { email })
+      .subscribe({ error: () => {} });
+  }
+
   // Image upload (returns { url: '/uploads/filename.ext' })
   uploadImage(fileName: string, fileData: string): Observable<{ url: string }> {
     return this.http.post<{ url: string }>(this.base + '/upload-image', { fileName, fileData });
