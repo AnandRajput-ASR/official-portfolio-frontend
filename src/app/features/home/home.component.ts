@@ -381,8 +381,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.resumeGateOpen = true;
       this.resumeGateEmail = '';
       this.resumeGateError = '';
+      // Tracking fires only after the gate is submitted (see submitResumeGate)
+    } else {
+      // Direct download — track immediately
+      this.trackResumeDownload();
     }
-    // If not protected, the default anchor <a download> behaviour takes over.
   }
 
   closeResumeGate(): void {

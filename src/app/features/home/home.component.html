@@ -108,6 +108,7 @@
           [href]="resumeService.getDownloadUrl()"
           class="btn-hero-primary"
           download
+          (click)="handleResumeClick($event)"
           >↓ Download Resume</a
         >
         <button class="theme-toggle-lg" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
@@ -889,7 +890,7 @@
           [href]="resumeService.getDownloadUrl()"
           class="btn-hero-resume"
           download
-          (click)="handleResumeClick($event); trackResumeDownload()"
+          (click)="handleResumeClick($event)"
           >↓ Download Resume</a
         >
       </div>
@@ -1042,7 +1043,7 @@
       class="btn-resume-dl"
       download
       target="_blank"
-      (click)="handleResumeClick($event); trackResumeDownload()"
+      (click)="handleResumeClick($event)"
       >{{ langService.t('btn.downloadResume') }}</a
     >
   </div>
