@@ -53,7 +53,7 @@
   "testi.name": "आपका नाम *",
   "testi.role": "पद / भूमिका",
   "testi.company": "कंपनी",
-  "testi.email": "आपका ईमेल (वैकल्पिक)",
+  "testi.email": "आपका ईमेल *",
   "testi.emailPlaceholder": "ramesh@company.com",
   "testi.quote": "आपकी समीक्षा *",
   "testi.quotePlaceholder": "आनंद के साथ काम करने का अपना अनुभव बताएं...",
