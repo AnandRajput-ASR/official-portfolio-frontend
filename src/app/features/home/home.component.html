@@ -48,6 +48,7 @@
         class="theme-toggle"
         (click)="themeService.toggle()"
         [title]="themeService.isDark() ? 'Switch to Light' : 'Switch to Dark'"
+        [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
       >
         <span *ngIf="themeService.isDark()">☀️</span>
         <span *ngIf="!themeService.isDark()">🌙</span>
@@ -82,7 +83,7 @@
         <span class="nav-logo"
           >{{ content.siteSettings.nav.logoText || 'AR' }}<span class="dot">.</span></span
         >
-        <button class="mobile-close" (click)="closeMobileMenu()">✕</button>
+        <button class="mobile-close" (click)="closeMobileMenu()" aria-label="Close menu">✕</button>
       </div>
       <nav class="mobile-nav">
         <a href="#about" (click)="closeMobileMenu()">About</a>
@@ -99,7 +100,7 @@
           download
           >↓ Download Resume</a
         >
-        <button class="theme-toggle-lg" (click)="themeService.toggle()">
+        <button class="theme-toggle-lg" (click)="themeService.toggle()" [attr.aria-label]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
           {{ themeService.isDark() ? '☀️ Light Mode' : '🌙 Dark Mode' }}
         </button>
       </div>
