@@ -1,0 +1,83 @@
+/* Dark theme (default) */
+:root,
+[data-theme='dark'] {
+  --bg: #0d0d0d;
+  --surface: #141414;
+  --surface2: #1a1a1a;
+  --border: #252525;
+  --text: #f0ede8;
+  --muted: #7a7570;
+  --amber: #f5a623;
+  --amber-dim: rgba(245, 166, 35, 0.1);
+  --amber-glow: rgba(245, 166, 35, 0.25);
+  --green: #4caf50;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+/* Light theme */
+[data-theme='light'] {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f2f0ec;
+  --border: #e0ddd8;
+  --text: #1a1816;
+  --muted: #6b6560;
+  --amber: #d4890a;
+  --amber-dim: rgba(212, 137, 10, 0.08);
+  --amber-glow: rgba(212, 137, 10, 0.2);
+  --green: #2e7d32;
+  --shadow: rgba(0, 0, 0, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+  &.visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--amber);
+}
