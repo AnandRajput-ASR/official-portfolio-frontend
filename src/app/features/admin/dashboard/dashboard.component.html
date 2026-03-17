@@ -142,14 +142,14 @@
             <label>Bio</label>
             <textarea rows="4" [(ngModel)]="heroEdit.bio" name="bio"></textarea>
           </div>
-          <div class="form-group">
-            <label>Location</label>
-            <input type="text" [(ngModel)]="heroEdit.location" name="location" />
-          </div>
         </div>
 
         <div class="form-card">
           <h3>Contact & Links</h3>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" [(ngModel)]="heroEdit.location" name="location" />
+          </div>
           <div class="form-group">
             <label>Email</label>
             <input type="email" [(ngModel)]="heroEdit.email" name="email" />
