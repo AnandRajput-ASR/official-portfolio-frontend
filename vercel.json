@@ -5,9 +5,18 @@
   "framework": null,
   "installCommand": "npm install",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "BACKEND_URL_HERE/api/$1" },
-    { "source": "/robots.txt", "destination": "BACKEND_URL_HERE/robots.txt" },
-    { "source": "/sitemap.xml", "destination": "BACKEND_URL_HERE/sitemap.xml" },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://official-portfolio-backend-6f1v.onrender.com/api/$1"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "https://official-portfolio-backend-6f1v.onrender.com/robots.txt"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://official-portfolio-backend-6f1v.onrender.com/sitemap.xml"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
