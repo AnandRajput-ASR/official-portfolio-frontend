@@ -3166,3 +3166,40 @@
     height: 240px;
   }
 }
+
+// ─── REDUCED MOTION ──────────────────────────────────────────────────────────
+// Respects the user's OS "reduce motion" accessibility preference.
+@media (prefers-reduced-motion: reduce) {
+  // Snap all transitions/animations to near-instant so there's no jarring motion
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  // Reveal elements must be immediately visible — with animation killed they'd
+  // stay at opacity:0 forever (their initial CSS value).
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  // Same for hero entrance animations
+  .anim-1,
+  .anim-2,
+  .anim-3,
+  .anim-4 {
+    opacity: 1;
+    animation: none;
+  }
+
+  // Stop ticker scrolling — show as wrapped static list instead
+  .ticker-wrap .ticker {
+    animation: none;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
