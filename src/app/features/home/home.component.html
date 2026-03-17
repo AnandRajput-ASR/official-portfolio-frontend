@@ -913,24 +913,26 @@
           "
         ></h2>
         <div class="contact-links">
-          <a [href]="'mailto:' + content.hero.email" class="clink" target="_blank">
-            <span class="clink-icon">✉</span>
-            <div style="flex:1">
-              <p class="clink-label">Email</p>
-              <p class="clink-val">{{ content.hero.email }}</p>
-            </div>
-          </a>
-          <button
-            class="clink clink-copy-email"
-            (click)="copyEmail()"
-            [title]="emailCopied ? 'Copied!' : 'Copy email address'"
-          >
-            <span class="clink-icon">{{ emailCopied ? '\u2713' : '\u29c9' }}</span>
-            <div>
-              <p class="clink-label">{{ emailCopied ? 'Copied!' : 'Copy' }}</p>
-              <p class="clink-val">to clipboard</p>
-            </div>
-          </button>
+          <div style="display:flex;gap:0.5rem;align-items:stretch">
+            <a [href]="'mailto:' + content.hero.email" class="clink" target="_blank" style="flex:1">
+              <span class="clink-icon">✉</span>
+              <div style="flex:1;min-width:0">
+                <p class="clink-label">Email</p>
+                <p class="clink-val" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ content.hero.email }}</p>
+              </div>
+            </a>
+            <button
+              class="clink clink-copy-email"
+              (click)="copyEmail()"
+              [title]="emailCopied ? 'Copied!' : 'Copy email address'"
+            >
+              <span class="clink-icon">{{ emailCopied ? '\u2713' : '\u29c9' }}</span>
+              <div>
+                <p class="clink-label">{{ emailCopied ? 'Copied!' : 'Copy' }}</p>
+                <p class="clink-val">to clipboard</p>
+              </div>
+            </button>
+          </div>
           <a [href]="content.hero.linkedin" target="_blank" class="clink">
             <span class="clink-icon">🔗</span>
             <div>
