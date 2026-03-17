@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npx ng build --configuration production",
   "outputDirectory": "dist/official-portfolio-frontend/browser",
   "framework": null,
+  "installCommand": "npm install",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "BACKEND_URL_HERE/api/$1" },
     { "source": "/robots.txt", "destination": "BACKEND_URL_HERE/robots.txt" },
