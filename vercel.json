@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/official-portfolio-frontend/browser",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "BACKEND_URL_HERE/api/$1" },
+    { "source": "/robots.txt", "destination": "BACKEND_URL_HERE/robots.txt" },
+    { "source": "/sitemap.xml", "destination": "BACKEND_URL_HERE/sitemap.xml" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

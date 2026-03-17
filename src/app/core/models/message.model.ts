@@ -5,6 +5,7 @@ export interface Message {
   message: string;
   read: boolean;
   starred: boolean;
+  notifiedAt: string | null;
   receivedAt: string;
 }
 
