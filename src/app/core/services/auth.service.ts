@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '@env/environment';
@@ -7,14 +7,12 @@ import { AuthResponse } from '@core/models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+
   private readonly TOKEN_KEY = 'portfolio_admin_token';
   private readonly USER_KEY = 'portfolio_admin_user';
   private loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
-
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {}
 
   login(username: string, password: string): Observable<AuthResponse> {
     return this.http

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { ContentService } from '@core/services/content.service';
-import { BlogPost, PortfolioContent } from '@core/models';
+import { BlogPost } from '@core/models';
 
 @Component({
   selector: 'app-blog-view',
@@ -354,17 +354,15 @@ import { BlogPost, PortfolioContent } from '@core/models';
   ],
 })
 export class BlogViewComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private contentService = inject(ContentService);
+  private titleService = inject(Title);
+
   post: BlogPost | null = null;
   notFound = false;
   authorName = 'Anand Rajput';
   authorTitle = 'Angular Developer & Azure Engineer';
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private contentService: ContentService,
-    private titleService: Title,
-  ) {}
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug');

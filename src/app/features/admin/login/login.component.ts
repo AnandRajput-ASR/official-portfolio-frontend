@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,15 +12,15 @@ import { AuthService } from '@core/services/auth.service';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   username = '';
   password = '';
   error = '';
   loading = false;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-  ) {
+  constructor() {
     if (this.auth.isLoggedInSnapshot()) {
       this.router.navigate(['/admin/dashboard']);
     }

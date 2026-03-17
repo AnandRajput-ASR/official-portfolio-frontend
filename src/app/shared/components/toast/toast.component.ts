@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -119,5 +119,5 @@ export class ToastService {
   ],
 })
 export class ToastComponent {
-  constructor(public ts: ToastService) {}
+  ts = inject(ToastService);
 }
