@@ -421,6 +421,10 @@ export class DashboardComponent implements OnInit {
           { label: 'Rust', icon: '⚙️', type: 'tech' },
         ],
       },
+      visitorCount: {
+        show: false,
+        threshold: 100,
+      },
     };
   }
 
@@ -1293,6 +1297,35 @@ export class DashboardComponent implements OnInit {
       s = this.analytics?.contactFormSubmissions || 0;
     if (!v) return '—';
     return ((s / v) * 100).toFixed(1) + '%';
+  }
+  /** Returns zero-filled 30-day visit array ready for the bar chart. */
+  visitChartBars(): { date: string; count: number; label: string }[] {
+    const days = 30;
+    const map = new Map<string, number>();
+    for (const d of this.analytics?.dailyVisits ?? []) map.set(d.date, d.count);
+    const bars: { date: string; count: number; label: string }[] = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      bars.push({ date: key, count: map.get(key) ?? 0, label });
+    }
+    return bars;
+  }
+  visitChartMax(): number {
+    return Math.max(1, ...this.visitChartBars().map(b => b.count));
+  }
+  /** Returns a +/- delta string vs last month. */
+  monthDelta(): string {
+    const cur = this.analytics?.thisMonth ?? 0;
+    const prev = this.analytics?.lastMonth ?? 0;
+    if (!prev) return cur > 0 ? '+' + cur + ' new' : '—';
+    const diff = cur - prev;
+    const pct = Math.round(Math.abs(diff) / prev * 100);
+    return (diff >= 0 ? '+' : '') + diff + ' (' + (diff >= 0 ? '+' : '') + pct + '% vs last month)';
+  }
+  today(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 
   // ── SITE SETTINGS ────────────────────────────────────────────────────────

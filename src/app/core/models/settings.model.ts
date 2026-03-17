@@ -70,4 +70,9 @@ export interface SiteSettings {
     enabled: boolean;
     items: LearningItem[];
   };
+  /** Public visitor counter shown in the footer. */
+  visitorCount: {
+    show: boolean;
+    threshold: number;  // only display publicly once this many visits recorded
+  };
 }

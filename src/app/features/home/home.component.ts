@@ -37,6 +37,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   contactError = '';
   emailCopied = false;
 
+  // Visitor counter (public footer widget)
+  visitorCount: number | null = null;
+
   // Testimonial submission form
   testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5, email: '' };
   testiSubmitAvatar: string | null = null;
@@ -80,6 +83,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadingService.stop('home-content');
         // Track page view
         this.contentService.trackEvent('pageView');
+        // Load visitor count for public footer widget
+        const threshold = data.siteSettings?.visitorCount?.threshold ?? 100;
+        if (data.siteSettings?.visitorCount?.show) {
+          this.contentService.getVisitorCount().subscribe({
+            next: (c) => {
+              if (c.thisMonth >= threshold) this.visitorCount = c.thisMonth;
+            },
+            error: () => {},
+          });
+        }
       },
       error: () => {
         this.loading = false;

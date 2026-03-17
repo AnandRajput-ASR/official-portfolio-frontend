@@ -2195,6 +2195,64 @@
     color: var(--muted);
     text-align: center;
   }
+  .ac-sublabel {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.4;
+  }
+}
+
+// ── Visit bar chart ───────────────────────────────────────────────────────────
+.visit-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+.vc-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 80px;
+}
+.vc-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+}
+.vc-bar-fill {
+  width: 100%;
+  min-height: 2px;
+  background: var(--border);
+  border-radius: 1px 1px 0 0;
+  transition: height 0.5s ease;
+  &.vc-bar-today {
+    background: var(--amber);
+  }
+}
+.vc-bar-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  color: var(--muted);
+  position: absolute;
+  bottom: calc(100% + 2px);
+  white-space: nowrap;
+}
+.vc-axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.56rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.35rem;
 }
 
 .analytics-section {
