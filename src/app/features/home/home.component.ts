@@ -67,6 +67,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.content = data;
         this.loading = false;
         this.refreshCaches();
+        // Propagate admin-configured enabled languages to LanguageService
+        if (data.siteSettings?.enabledLanguages?.length) {
+          this.langService.setEnabledLangs(data.siteSettings.enabledLanguages);
+        }
         // run reveal AFTER DOM renders
         setTimeout(() => {
           this.setupScrollReveal();
@@ -325,6 +329,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.apiError = false;
         this.refreshCaches();
+        if (data.siteSettings?.enabledLanguages?.length) {
+          this.langService.setEnabledLangs(data.siteSettings.enabledLanguages);
+        }
         // run reveal AFTER DOM renders
         setTimeout(() => {
           this.setupScrollReveal();

@@ -22,6 +22,9 @@ export class LanguageService {
   /** Currently active language code */
   lang = signal<Lang>(this.getSavedLang());
 
+  /** Languages currently enabled via admin settings (subset of SUPPORTED_LANGS) */
+  activeLangs = signal<Lang[]>(SUPPORTED_LANGS);
+
   /** Loaded translation map for the current language */
   private translations = signal<Record<string, string>>({});
 
@@ -32,10 +35,25 @@ export class LanguageService {
     this.loadLang(this.lang());
   }
 
-  /** Cycle through supported languages: en â†’ hi â†’ jp â†’ en â†’ â€¦ */
+  /**
+   * Called once after site settings load. Restricts the toggle cycle to the
+   * admin-configured subset. If the current lang is no longer enabled, falls
+   * back to the first enabled language.
+   */
+  setEnabledLangs(langs: string[]): void {
+    const valid = langs.filter((l): l is Lang => SUPPORTED_LANGS.includes(l as Lang)) as Lang[];
+    const active = valid.length > 0 ? valid : (['en'] as Lang[]);
+    this.activeLangs.set(active);
+    if (!active.includes(this.lang())) {
+      this.setLang(active[0]);
+    }
+  }
+
+  /** Cycle through admin-enabled languages only */
   toggle(): void {
-    const idx = SUPPORTED_LANGS.indexOf(this.lang());
-    const next = SUPPORTED_LANGS[(idx + 1) % SUPPORTED_LANGS.length];
+    const active = this.activeLangs();
+    const idx = active.indexOf(this.lang());
+    const next = active[(idx + 1) % active.length];
     this.setLang(next);
   }
 

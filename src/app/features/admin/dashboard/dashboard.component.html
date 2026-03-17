@@ -1189,6 +1189,36 @@
         </div>
       </div>
 
+      <!-- Language Toggle -->
+      <div class="settings-card" style="margin-top: 1.25rem">
+        <h3 style="margin-bottom: 0.35rem">🌐 Language Toggle</h3>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem">Check the languages you want visitors to see. The toggle button is hidden automatically when only one language is enabled.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+            <input
+              type="checkbox"
+              [checked]="settingsEdit.enabledLanguages?.includes('en')"
+              (change)="toggleLang('en'); markDirty()"
+            /> English (EN)
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+            <input
+              type="checkbox"
+              [checked]="settingsEdit.enabledLanguages?.includes('hi')"
+              (change)="toggleLang('hi'); markDirty()"
+            /> हिन्दी (HI)
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem">
+            <input
+              type="checkbox"
+              [checked]="settingsEdit.enabledLanguages?.includes('jp')"
+              (change)="toggleLang('jp'); markDirty()"
+            /> 日本語 (JP)
+          </label>
+        </div>
+        <small style="color:var(--muted);font-size:0.72rem;margin-top:0.6rem;display:block">English cannot be removed — it is the fallback language.</small>
+      </div>
+
       <!-- Currently Learning -->
       <div class="settings-card" style="margin-top: 1.25rem">
         <h3 style="margin-bottom: 1.25rem">📖 Currently Learning Widget</h3>
