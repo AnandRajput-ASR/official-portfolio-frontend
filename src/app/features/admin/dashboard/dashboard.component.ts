@@ -246,6 +246,19 @@ export class DashboardComponent implements OnInit {
     this.dirtyTabs.delete(this.activeTab);
   }
 
+  /** Toggle a language code in settingsEdit.enabledLanguages. English is always kept. */
+  toggleLang(code: string): void {
+    const langs: string[] = this.settingsEdit.enabledLanguages ?? ['en', 'hi', 'jp'];
+    const idx = langs.indexOf(code);
+    if (idx === -1) {
+      langs.push(code);
+    } else if (code !== 'en') {
+      // English cannot be removed — it's the fallback
+      langs.splice(idx, 1);
+    }
+    this.settingsEdit.enabledLanguages = [...langs];
+  }
+
   getDirtyTabsLabel(): string {
     return Array.from(this.dirtyTabs)
       .map((t) => this.tabLabel(t))
@@ -397,6 +410,7 @@ export class DashboardComponent implements OnInit {
       nav: { logoText: 'AR', showResume: true },
       siteUrl: 'https://anandrajput.dev',
       resumeProtected: false,
+      enabledLanguages: ['en', 'hi', 'jp'],
       learning: {
         enabled: false,
         items: [

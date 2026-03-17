@@ -62,6 +62,9 @@ export interface SiteSettings {
   siteUrl: string;
   /** When true, visitors must enter their email before the resume download begins. */
   resumeProtected: boolean;
+  /** Languages enabled on the public site. Codes must match files in public/assets/i18n/.
+   *  When only one language is enabled the toggle button is hidden automatically. */
+  enabledLanguages: string[];
   /** "Currently learning" widget displayed near the footer. */
   learning: {
     enabled: boolean;

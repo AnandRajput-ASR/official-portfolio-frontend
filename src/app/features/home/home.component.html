@@ -54,8 +54,9 @@
         <span *ngIf="!themeService.isDark()">🌙</span>
       </button>
 
-      <!-- Language toggle -->
+      <!-- Language toggle — hidden automatically when admin enables only one language -->
       <button
+        *ngIf="langService.activeLangs().length > 1"
         class="lang-toggle"
         (click)="langService.toggle()"
         title="Switch language"
