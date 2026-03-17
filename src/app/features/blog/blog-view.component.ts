@@ -392,6 +392,9 @@ export class BlogViewComponent implements OnInit {
     if (!raw) return '';
     let html = raw;
 
+    // Normalize stored literal \n sequences (e.g. from JSON/DB) to real newlines
+    html = html.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n');
+
     // Escape HTML entities first (prevent XSS in content field)
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
