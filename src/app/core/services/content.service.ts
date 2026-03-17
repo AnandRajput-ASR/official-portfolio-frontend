@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
-import { Hero, PortfolioContent, SiteSettings, Testimonial } from '@core/models';
+import { PortfolioContent, SiteSettings, Testimonial } from '@core/models';
 
 @Injectable({
   providedIn: 'root',
@@ -22,19 +22,6 @@ export class ContentService {
   getAll(): Observable<PortfolioContent> {
     return this.http.get<PortfolioContent>(this.base + '/page-content');
   }
-  updateHero(hero: Hero): Observable<any> {
-    return this.http.put(this.base + '/hero', hero);
-  }
-
-  // Companies
-
-  // Personal Projects
-
-  // Experience
-
-  // Stats
-
-  // Certifications
 
   // Settings
   getSettings(): Observable<SiteSettings> {
