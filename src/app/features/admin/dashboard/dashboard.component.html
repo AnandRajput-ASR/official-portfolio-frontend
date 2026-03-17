@@ -1172,6 +1172,62 @@
             Changing this updates <code>/robots.txt</code> and <code>/sitemap.xml</code> instantly without redeploying.
           </small>
         </div>
+
+        <!-- Resume gate -->
+        <div class="form-group" style="margin-top: 0.75rem">
+          <label>🔒 Require Email Before Resume Download</label>
+          <label class="big-toggle" style="margin-top: 0.35rem">
+            <input
+              type="checkbox"
+              [(ngModel)]="settingsEdit.resumeProtected"
+              (ngModelChange)="markDirty()"
+            /><span class="big-toggle-slider"></span>
+          </label>
+          <small style="color: var(--muted); font-size: 0.72rem; margin-top: 0.35rem; display: block">
+            When enabled, visitors must enter their email address before the resume PDF downloads.
+          </small>
+        </div>
+      </div>
+
+      <!-- Currently Learning -->
+      <div class="settings-card" style="margin-top: 1.25rem">
+        <h3 style="margin-bottom: 1.25rem">📖 Currently Learning Widget</h3>
+        <div class="form-group">
+          <label>Show Widget on Portfolio</label>
+          <label class="big-toggle" style="margin-top: 0.35rem">
+            <input
+              type="checkbox"
+              [(ngModel)]="settingsEdit.learning.enabled"
+              (ngModelChange)="markDirty()"
+            /><span class="big-toggle-slider"></span>
+          </label>
+        </div>
+        <div *ngIf="settingsEdit.learning.enabled" style="margin-top: 1rem">
+          <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem">Each item shows as a chip near the footer. Type is displayed as a tag (book / course / tech / other).</p>
+          <div
+            *ngFor="let item of settingsEdit.learning.items; let i = index; trackBy: trackByIndex"
+            class="form-row"
+            style="align-items:flex-end;gap:0.5rem;margin-bottom:0.5rem"
+          >
+            <div class="form-group xs"><label>Icon</label><input type="text" [(ngModel)]="item.icon" (ngModelChange)="markDirty()" placeholder="📚" /></div>
+            <div class="form-group"><label>Label</label><input type="text" [(ngModel)]="item.label" (ngModelChange)="markDirty()" placeholder="Designing Distributed Systems" /></div>
+            <div class="form-group xs">
+              <label>Type</label>
+              <select [(ngModel)]="item.type" (ngModelChange)="markDirty()">
+                <option value="book">book</option>
+                <option value="course">course</option>
+                <option value="tech">tech</option>
+                <option value="other">other</option>
+              </select>
+            </div>
+            <div class="form-group"><label>URL (opt)</label><input type="url" [(ngModel)]="item.url" (ngModelChange)="markDirty()" placeholder="https://..." /></div>
+            <button class="btn-icon-danger" (click)="settingsEdit.learning.items.splice(i,1); markDirty()" title="Remove" style="margin-bottom:0.1rem">✕</button>
+          </div>
+          <button
+            class="btn-add"
+            (click)="settingsEdit.learning.items.push({ label: '', icon: '📖', type: 'other' }); markDirty()"
+          >+ Add Item</button>
+        </div>
       </div>
 
       <!-- Hero Content -->

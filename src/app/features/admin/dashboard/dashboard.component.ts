@@ -396,6 +396,15 @@ export class DashboardComponent implements OnInit {
       },
       nav: { logoText: 'AR', showResume: true },
       siteUrl: 'https://anandrajput.dev',
+      resumeProtected: false,
+      learning: {
+        enabled: false,
+        items: [
+          { label: 'Designing Distributed Systems', icon: '📚', type: 'book' },
+          { label: 'AWS Solutions Architect', icon: '🎓', type: 'course' },
+          { label: 'Rust', icon: '⚙️', type: 'tech' },
+        ],
+      },
     };
   }
 
@@ -1613,5 +1622,9 @@ export class DashboardComponent implements OnInit {
   }
   trackById(_: number, item: { id: string }): string {
     return item.id;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

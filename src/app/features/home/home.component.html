@@ -22,24 +22,24 @@
 
     <!-- Desktop links -->
     <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Work</a>
-      <a href="#personal-projects">Side Projects</a>
-      <a href="#certs">Certifications</a>
+      <a href="#about">{{ langService.t('nav.about') }}</a>
+      <a href="#skills">{{ langService.t('nav.skills') }}</a>
+      <a href="#projects">{{ langService.t('nav.work') }}</a>
+      <a href="#personal-projects">{{ langService.t('nav.sideProjects') }}</a>
+      <a href="#certs">{{ langService.t('nav.certs') }}</a>
       <a
         href="#testimonials"
         *ngIf="
           content.siteSettings.sections.testimonials !== false && visibleTestimonials().length > 0
         "
-        >Reviews</a
+        >{{ langService.t('nav.reviews') }}</a
       >
       <a
         href="#blog"
         *ngIf="content.siteSettings.sections.blog !== false && publishedPosts().length > 0"
-        >Writing</a
+        >{{ langService.t('nav.writing') }}</a
       >
-      <a href="#contact">Hire Me</a>
+      <a href="#contact">{{ langService.t('nav.hire') }}</a>
     </div>
 
     <div class="nav-right">
@@ -54,13 +54,22 @@
         <span *ngIf="!themeService.isDark()">🌙</span>
       </button>
 
+      <!-- Language toggle -->
+      <button
+        class="lang-toggle"
+        (click)="langService.toggle()"
+        [title]="langService.isHindi() ? 'Switch to English' : 'हिंदी में देखें'"
+        aria-label="Toggle language"
+      >{{ langService.isHindi() ? 'EN' : 'हि' }}</button>
+
       <!-- Resume quick link -->
       <a
         *ngIf="resumeInfo?.available"
         [href]="resumeService.getDownloadUrl()"
         class="btn-nav-resume"
         download
-        >↓ Resume</a
+        (click)="handleResumeClick($event)"
+        >{{ langService.t('nav.resume') }}</a
       >
 
       <!-- Mobile hamburger -->
@@ -149,6 +158,7 @@
             [href]="resumeService.getDownloadUrl()"
             class="btn-hero-resume"
             download
+            (click)="handleResumeClick($event)"
             >↓ Resume</a
           >
         </div>
@@ -728,6 +738,11 @@
           ></textarea>
         </div>
 
+        <div class="cform-group">
+          <label>{{ langService.t('testi.email') }}</label
+          ><input type="email" [(ngModel)]="testiSubmitForm.email" [placeholder]="langService.t('testi.emailPlaceholder')" />
+        </div>
+
         <!-- Star Rating -->
         <div class="cform-group">
           <label>Rating</label>
@@ -820,6 +835,29 @@
     </div>
   </section>
 
+  <!-- ═══ CURRENTLY LEARNING ════════════════════════════════════════════════════════ -->
+  <section
+    class="learning-section"
+    *ngIf="content.siteSettings.learning?.enabled && content.siteSettings.learning?.items?.length"
+  >
+    <div class="learning-inner reveal">
+      <p class="learning-label">{{ langService.t('learning.title') }}</p>
+      <div class="learning-chips">
+        <a
+          *ngFor="let item of content.siteSettings.learning.items"
+          [href]="item.url || null"
+          [target]="item.url ? '_blank' : null"
+          class="learning-chip"
+          [class.learning-chip-link]="item.url"
+        >
+          <span class="learning-icon">{{ item.icon }}</span>
+          <span class="learning-text">{{ item.label }}</span>
+          <span class="learning-type">{{ item.type }}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ═══ FREELANCE CTA ════════════════════════════════════════════════════════ -->
   <section
     class="freelance-cta"
@@ -850,7 +888,7 @@
           [href]="resumeService.getDownloadUrl()"
           class="btn-hero-resume"
           download
-          (click)="trackResumeDownload()"
+          (click)="handleResumeClick($event); trackResumeDownload()"
           >↓ Download Resume</a
         >
       </div>
@@ -1003,8 +1041,8 @@
       class="btn-resume-dl"
       download
       target="_blank"
-      (click)="trackResumeDownload()"
-      >↓ Download PDF</a
+      (click)="handleResumeClick($event); trackResumeDownload()"
+      >{{ langService.t('btn.downloadResume') }}</a
     >
   </div>
 
@@ -1023,6 +1061,34 @@
       </div>
     </div>
   </footer>
+</div>
+
+<!-- ═══ RESUME GATE MODAL ═══════════════════════════════════════════════════ -->
+<div class="resume-gate-overlay" *ngIf="resumeGateOpen" (click)="closeResumeGate()">
+  <div class="resume-gate-modal" (click)="$event.stopPropagation()">
+    <button class="rg-close" (click)="closeResumeGate()" aria-label="Close">✕</button>
+    <p class="rg-title">{{ langService.t('resume.gateTitle') }}</p>
+    <p class="rg-sub">{{ langService.t('resume.gateSub') }}</p>
+    <div class="cform-group">
+      <label>{{ langService.t('resume.gateEmail') }}</label>
+      <input
+        type="email"
+        [(ngModel)]="resumeGateEmail"
+        [placeholder]="langService.t('resume.gatePlaceholder')"
+        (keydown.enter)="submitResumeGate()"
+        autofocus
+      />
+    </div>
+    <div class="error-banner" *ngIf="resumeGateError">⚠ {{ resumeGateError }}</div>
+    <div class="rg-actions">
+      <button class="btn-hero-primary" (click)="submitResumeGate()">
+        {{ langService.t('resume.gateBtn') }}
+      </button>
+      <button class="rg-cancel" (click)="closeResumeGate()">
+        {{ langService.t('resume.gateCancel') }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <ng-template #loader>

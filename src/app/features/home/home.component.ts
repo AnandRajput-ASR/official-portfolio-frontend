@@ -7,6 +7,7 @@ import { LoadingService } from '@core/services/loading.service';
 import { MessagesService } from '@core/services/messages.service';
 import { ResumeService, ResumeInfo } from '@core/services/resume.service';
 import { ThemeService } from '@core/services/theme.service';
+import { LanguageService } from '@core/services/language.service';
 import { PortfolioContent } from '@core/models';
 
 @Component({
@@ -37,12 +38,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   emailCopied = false;
 
   // Testimonial submission form
-  testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
+  testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5, email: '' };
   testiSubmitAvatar: string | null = null;
   testiSubmitting = false;
   testiSubmitSuccess = false;
   testiSubmitError = '';
   showTestiSubmitForm = false;
+
+  // Resume gate modal
+  resumeGateOpen = false;
+  resumeGateEmail = '';
+  resumeGateError = '';
 
   constructor(
     public contentService: ContentService,
@@ -50,6 +56,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     public resumeService: ResumeService,
     public themeService: ThemeService,
+    public langService: LanguageService,
     private loadingService: LoadingService,
   ) {}
 
@@ -126,7 +133,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       next: () => {
         this.testiSubmitting = false;
         this.testiSubmitSuccess = true;
-        this.testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5 };
+        this.testiSubmitForm = { name: '', role: '', company: '', quote: '', rating: 5, email: '' };
         this.testiSubmitAvatar = null;
         setTimeout(() => {
           this.testiSubmitSuccess = false;
@@ -353,5 +360,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.emailCopied = true;
       setTimeout(() => (this.emailCopied = false), 2000);
     });
+  }
+
+  /** Opens the resume-gate modal if protection is on, otherwise downloads directly. */
+  handleResumeClick(event: Event): void {
+    if (this.content?.siteSettings?.resumeProtected) {
+      event.preventDefault();
+      this.resumeGateOpen = true;
+      this.resumeGateEmail = '';
+      this.resumeGateError = '';
+    }
+    // If not protected, the default anchor <a download> behaviour takes over.
+  }
+
+  closeResumeGate(): void {
+    this.resumeGateOpen = false;
+  }
+
+  submitResumeGate(): void {
+    const email = this.resumeGateEmail.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.resumeGateError = 'Please enter a valid email address.';
+      return;
+    }
+    // Track it as a contact event so admin can see in analytics, then start download
+    this.contentService.trackEvent('resumeDownload');
+    this.resumeGateOpen = false;
+    // Trigger download programmatically
+    const a = document.createElement('a');
+    a.href = this.resumeService.getDownloadUrl();
+    a.download = '';
+    a.click();
   }
 }
