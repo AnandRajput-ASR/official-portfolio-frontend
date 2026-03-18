@@ -7,15 +7,15 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://official-portfolio-backend-6f1v.onrender.com/api/$1"
+      "destination": "https://official-portfolio-backend-production.up.railway.app/api/$1"
     },
     {
       "source": "/robots.txt",
-      "destination": "https://official-portfolio-backend-6f1v.onrender.com/robots.txt"
+      "destination": "https://official-portfolio-backend-production.up.railway.app/robots.txt"
     },
     {
       "source": "/sitemap.xml",
-      "destination": "https://official-portfolio-backend-6f1v.onrender.com/sitemap.xml"
+      "destination": "https://official-portfolio-backend-production.up.railway.app/sitemap.xml"
     },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
