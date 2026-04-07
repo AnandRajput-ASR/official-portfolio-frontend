@@ -1,19 +1,20 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { Certification, PortfolioContent } from '@core/models';
 import { ContentService } from '@core/services/content.service';
+import { LanguageService } from '@core/services/language.service';
 import { LoadingService } from '@core/services/loading.service';
 import { MessagesService } from '@core/services/messages.service';
-import { ResumeService, ResumeInfo } from '@core/services/resume.service';
+import { ResumeInfo, ResumeService } from '@core/services/resume.service';
 import { ThemeService } from '@core/services/theme.service';
-import { LanguageService } from '@core/services/language.service';
-import { PortfolioContent } from '@core/models';
+import { CertificationBadgeComponent } from '@shared/components/certification-badge/certification-badge.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, CertificationBadgeComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
@@ -372,6 +373,24 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   trackById(_: number, item: { id: string }): string {
     return item.id;
+  }
+
+  get currentYear(): number {
+    return new Date().getFullYear();
+  }
+
+  certificationStatus(cert: Partial<Certification>): 'active' | 'expired' | 'no-expiry' {
+    const expiration = String(cert.expirationYear ?? '').trim();
+    const expires = Number(expiration);
+    if (!expiration || Number.isNaN(expires)) return 'no-expiry';
+    return expires < this.currentYear ? 'expired' : 'active';
+  }
+
+  verificationLabel(url: string | null | undefined): string {
+    const safeUrl = this.externalUrl(url).toLowerCase();
+    if (safeUrl.includes('credly.com')) return 'Verify on Credly';
+    if (safeUrl.includes('microsoft.')) return 'Verify on Microsoft';
+    return 'Verify Certificate';
   }
 
   /** Ensures external links always have a protocol so the browser doesn't

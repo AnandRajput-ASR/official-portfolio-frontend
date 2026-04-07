@@ -1,37 +1,38 @@
-import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ContentService } from '@core/services/content.service';
-import { AdminService } from '@core/services/admin.service';
-import { CertBadgeService } from '@core/services/cert-badge.service';
 import { DragListDirective } from '@core/directives/drag-list.directive';
-import { AuthService } from '@core/services/auth.service';
-import { MessagesService } from '@core/services/messages.service';
-import { ResumeService, ResumeInfo, UploadProgress } from '@core/services/resume.service';
-import { ThemeService } from '@core/services/theme.service';
-import { ToastService } from '@shared/components/toast/toast.component';
-import { ToastComponent } from '@shared/components/toast/toast.component';
 import {
-  ConfirmDialogComponent,
-  ConfirmConfig,
-} from '@shared/components/confirm-dialog/confirm-dialog.component';
-import {
-  PortfolioContent,
-  Hero,
-  Skill,
+  Analytics,
+  BlogPost,
+  Certification,
   Company,
   CompanyProject,
-  PersonalProject,
   Experience,
+  Hero,
   Message,
-  Certification,
-  Testimonial,
-  BlogPost,
+  PersonalProject,
+  PortfolioContent,
   SiteSettings,
-  Analytics,
+  Skill,
   Stat,
+  Testimonial,
 } from '@core/models';
+import { AdminService } from '@core/services/admin.service';
+import { AuthService } from '@core/services/auth.service';
+import { CertBadgeService } from '@core/services/cert-badge.service';
+import { ContentService } from '@core/services/content.service';
+import { LoadingService } from '@core/services/loading.service';
+import { MessagesService } from '@core/services/messages.service';
+import { ResumeInfo, ResumeService, UploadProgress } from '@core/services/resume.service';
+import { ThemeService } from '@core/services/theme.service';
+import { CertificationBadgeComponent } from '@shared/components/certification-badge/certification-badge.component';
+import {
+  ConfirmConfig,
+  ConfirmDialogComponent,
+} from '@shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastComponent, ToastService } from '@shared/components/toast/toast.component';
 
 type ActiveTab =
   | 'hero'
@@ -52,11 +53,18 @@ type ActiveTab =
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragListDirective, ToastComponent, ConfirmDialogComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    DragListDirective,
+    ToastComponent,
+    ConfirmDialogComponent,
+    CertificationBadgeComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   contentService = inject(ContentService);
   private adminService = inject(AdminService);
   auth = inject(AuthService);
@@ -66,6 +74,7 @@ export class DashboardComponent implements OnInit {
   certBadge = inject(CertBadgeService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private loadingService = inject(LoadingService);
 
   content: PortfolioContent | null = null;
   sidebarOpen = false;
@@ -111,6 +120,8 @@ export class DashboardComponent implements OnInit {
   showAddCert = false;
   newCert: Partial<Certification> = this.emptyCert();
   certUploadPreview = '';
+  private pendingCertUploadUrls = new Set<string>();
+  private badgeBgRemovalRunning = new Set<string>();
   showAddTestimonial = false;
   newTestimonial: Partial<Testimonial> = this.emptyTestimonial();
   testimonialAvatarPreview = '';
@@ -159,6 +170,10 @@ export class DashboardComponent implements OnInit {
     this.loadPendingTestimonials();
   }
 
+  ngOnDestroy(): void {
+    this.cleanupUnusedPendingCertUploads();
+  }
+
   // ── Tab switching with dirty check ────────────────────────────────────────
   async setTab(tab: ActiveTab): Promise<void> {
     if (tab === this.activeTab) return;
@@ -201,6 +216,7 @@ export class DashboardComponent implements OnInit {
         break;
       case 'certifications':
         this.certificationsEdit = JSON.parse(JSON.stringify(this.content.certifications || []));
+        this.cleanupUnusedPendingCertUploads();
         break;
       case 'testimonials':
         this.testimonialsEdit = JSON.parse(JSON.stringify(this.content.testimonials || []));
@@ -307,6 +323,7 @@ export class DashboardComponent implements OnInit {
     const defaults = this.defaultSettings();
     this.settingsEdit = this.mergeWithDefaults(defaults, rawSettings);
     this.statsEdit = JSON.parse(JSON.stringify(this.content.stats || []));
+    this.cleanupUnusedPendingCertUploads();
     this.dirtyTabs.clear();
   }
 
@@ -912,16 +929,33 @@ export class DashboardComponent implements OnInit {
 
   // ── CERTIFICATIONS ────────────────────────────────────────────────────────
   saveCertifications(): void {
+    const loaderKey = 'admin-certifications-save';
+    const invalidCertification = this.certificationsEdit.find(
+      (certification) => !this.isCertificationYearRangeValid(certification),
+    );
+    if (invalidCertification) {
+      this.toast.error(`Check years for ${invalidCertification.code || invalidCertification.name}`);
+      return;
+    }
+
+    const previousCertifications = JSON.parse(
+      JSON.stringify(this.content?.certifications || []),
+    ) as Certification[];
     this.saving = true;
+    this.loadingService.start(loaderKey);
     this.adminService.updateCertifications(this.certificationsEdit).subscribe({
       next: () => {
+        this.deleteRemovedSavedCertUploads(previousCertifications, this.certificationsEdit);
+        this.releaseSavedCertUploads(this.certificationsEdit);
         this.content!.certifications = JSON.parse(JSON.stringify(this.certificationsEdit));
         this.saving = false;
+        this.loadingService.stop(loaderKey);
         this.clearDirty();
         this.toast.success('Certifications saved!');
       },
       error: () => {
         this.saving = false;
+        this.loadingService.stop(loaderKey);
         this.toast.error('Save failed');
       },
     });
@@ -935,15 +969,22 @@ export class DashboardComponent implements OnInit {
       level: this.newCert.level || 'Associate',
       credlyLink: this.newCert.credlyLink || '',
       badgeLink: this.certUploadPreview || this.newCert.badgeLink || '',
-      badgeType: (this.newCert.badgeType || 'auto') as any,
+      badgeType: (this.newCert.badgeType || 'auto') as Certification['badgeType'],
       accentColor: this.newCert.accentColor || '#0078d4',
       issueYear: this.newCert.issueYear || String(new Date().getFullYear()),
-      expirationYear: '',
+      expirationYear: this.newCert.expirationYear || '',
       displayOrder: this.certificationsEdit.length,
     };
+
+    if (!this.isCertificationYearRangeValid(cert)) {
+      this.toast.error('Please enter valid issued/expiry years (expiry must be after issued).');
+      return;
+    }
+
     this.adminService.addCertification(cert).subscribe({
       next: (res) => {
         this.certificationsEdit.push(res.data);
+        this.releaseSavedCertUploads([res.data]);
         this.content!.certifications = JSON.parse(JSON.stringify(this.certificationsEdit));
         this.showAddCert = false;
         this.newCert = this.emptyCert();
@@ -962,40 +1003,96 @@ export class DashboardComponent implements OnInit {
       icon: '🏅',
     });
     if (!ok) return;
+    const deletedCert = this.certificationsEdit.find((certification) => certification.id === id);
     this.adminService.deleteCertification(id).subscribe({
       next: () => {
         this.certificationsEdit = this.certificationsEdit.filter((c) => c.id !== id);
+        if (deletedCert?.badgeLink) this.cleanupUploadedCertImage(deletedCert.badgeLink);
         this.content!.certifications = JSON.parse(JSON.stringify(this.certificationsEdit));
         this.toast.success('Certification deleted');
       },
       error: () => this.toast.error('Delete failed'),
     });
   }
+  triggerFileInput(certId: string): void {
+    const input = document.getElementById(`badge-upload-${certId}`) as HTMLInputElement;
+    input?.click();
+  }
+
+  closeAddCertModal(): void {
+    this.showAddCert = false;
+    this.newCert = this.emptyCert();
+    this.certUploadPreview = '';
+    this.cleanupUnusedPendingCertUploads();
+  }
+
   onCertBadgeUpload(cert: Partial<Certification>, e: Event): void {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
+
+    const previousBadgeLink = cert.badgeLink || '';
+    const idx = this.certificationsEdit.findIndex((item) => item.id === cert.id);
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
       const base64 = dataUrl.split(',')[1];
-      // Show preview immediately
+
+      cert.badgeType = 'upload';
+      cert.badgeLink = dataUrl;
+      if (idx !== -1) {
+        this.certificationsEdit[idx] = {
+          ...this.certificationsEdit[idx],
+          badgeType: 'upload',
+          badgeLink: dataUrl,
+        };
+      }
       if (cert === this.newCert) this.certUploadPreview = dataUrl;
-      // Upload to server → store URL path instead of base64
+
       this.contentService.uploadImage(file.name, base64).subscribe({
         next: ({ url }) => {
           cert.badgeLink = url;
+          this.pendingCertUploadUrls.add(url);
+          if (this.pendingCertUploadUrls.has(previousBadgeLink)) {
+            this.cleanupUploadedCertImage(previousBadgeLink);
+          }
+          if (idx !== -1) {
+            this.certificationsEdit[idx] = {
+              ...this.certificationsEdit[idx],
+              badgeType: 'upload',
+              badgeLink: url,
+            };
+          }
           if (cert === this.newCert) this.certUploadPreview = url;
         },
         error: () => {
           cert.badgeLink = dataUrl;
-        }, // fallback to base64 if upload fails
+          if (this.pendingCertUploadUrls.has(previousBadgeLink)) {
+            this.cleanupUploadedCertImage(previousBadgeLink);
+          }
+          if (idx !== -1) {
+            this.certificationsEdit[idx] = {
+              ...this.certificationsEdit[idx],
+              badgeType: 'upload',
+              badgeLink: dataUrl,
+            };
+          }
+        },
       });
     };
+
     reader.readAsDataURL(file);
   }
+
   setBadgeType(cert: Partial<Certification>, type: 'auto' | 'upload' | 'default'): void {
+    const previousBadgeLink = cert.badgeLink || '';
     cert.badgeType = type;
-    if (type !== 'upload') cert.badgeLink = '';
+    if (type !== 'upload') {
+      cert.badgeLink = '';
+      if (cert === this.newCert) this.certUploadPreview = '';
+      if (this.pendingCertUploadUrls.has(previousBadgeLink)) {
+        this.cleanupUploadedCertImage(previousBadgeLink);
+      }
+    }
     const idx = this.certificationsEdit.findIndex((c) => c.id === cert.id);
     if (idx !== -1)
       this.certificationsEdit[idx] = {
@@ -1003,6 +1100,248 @@ export class DashboardComponent implements OnInit {
         badgeType: type,
         badgeLink: type !== 'upload' ? '' : cert.badgeLink || '',
       };
+  }
+
+  isBgRemovalRunning(cert: Partial<Certification>): boolean {
+    return this.badgeBgRemovalRunning.has(this.badgeProcessingKey(cert));
+  }
+
+  async removeUploadedBadgeBackground(cert: Partial<Certification>): Promise<void> {
+    const source =
+      cert === this.newCert ? this.certUploadPreview || cert.badgeLink || '' : cert.badgeLink || '';
+    if (!source) {
+      this.toast.info('Upload a badge image first.');
+      return;
+    }
+
+    const key = this.badgeProcessingKey(cert);
+    if (this.badgeBgRemovalRunning.has(key)) return;
+    this.badgeBgRemovalRunning.add(key);
+
+    const previousBadgeLink = cert.badgeLink || '';
+    const idx = this.certificationsEdit.findIndex((item) => item.id === cert.id);
+
+    try {
+      const processedDataUrl = await this.removeBackgroundToPng(source);
+      const base64 = processedDataUrl.split(',')[1];
+
+      cert.badgeType = 'upload';
+      cert.badgeLink = processedDataUrl;
+      if (idx !== -1) {
+        this.certificationsEdit[idx] = {
+          ...this.certificationsEdit[idx],
+          badgeType: 'upload',
+          badgeLink: processedDataUrl,
+        };
+      }
+      if (cert === this.newCert) this.certUploadPreview = processedDataUrl;
+
+      this.contentService.uploadImage(`cert-badge-${Date.now()}.png`, base64).subscribe({
+        next: ({ url }) => {
+          cert.badgeLink = url;
+          this.pendingCertUploadUrls.add(url);
+          if (this.pendingCertUploadUrls.has(previousBadgeLink)) {
+            this.cleanupUploadedCertImage(previousBadgeLink);
+          }
+          if (idx !== -1) {
+            this.certificationsEdit[idx] = {
+              ...this.certificationsEdit[idx],
+              badgeType: 'upload',
+              badgeLink: url,
+            };
+          }
+          if (cert === this.newCert) this.certUploadPreview = url;
+          this.badgeBgRemovalRunning.delete(key);
+          this.toast.success('Background removed');
+        },
+        error: () => {
+          this.badgeBgRemovalRunning.delete(key);
+          this.toast.info('Background preview applied locally. Save to keep it.');
+        },
+      });
+    } catch {
+      this.badgeBgRemovalRunning.delete(key);
+      this.toast.error('Could not remove background from this image.');
+    }
+  }
+
+  private badgeProcessingKey(cert: Partial<Certification>): string {
+    return cert.id || 'new-cert';
+  }
+
+  private removeBackgroundToPng(source: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = 'anonymous';
+
+      image.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas context unavailable'));
+            return;
+          }
+
+          ctx.drawImage(image, 0, 0);
+          const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = frame.data;
+          const width = canvas.width;
+          const height = canvas.height;
+
+          const corners = [
+            this.pixelAt(data, width, 0, 0),
+            this.pixelAt(data, width, width - 1, 0),
+            this.pixelAt(data, width, 0, height - 1),
+            this.pixelAt(data, width, width - 1, height - 1),
+          ];
+          const bg = this.averagePixel(corners);
+
+          const visited = new Uint8Array(width * height);
+          const queue: [number, number][] = [];
+          for (let x = 0; x < width; x++) {
+            queue.push([x, 0], [x, height - 1]);
+          }
+          for (let y = 0; y < height; y++) {
+            queue.push([0, y], [width - 1, y]);
+          }
+
+          const tolerance = 40;
+          while (queue.length) {
+            const [x, y] = queue.shift() as [number, number];
+            const index = y * width + x;
+            if (visited[index]) continue;
+            visited[index] = 1;
+
+            const rgba = this.pixelAt(data, width, x, y);
+            const nearBackground =
+              Math.abs(rgba[0] - bg[0]) <= tolerance &&
+              Math.abs(rgba[1] - bg[1]) <= tolerance &&
+              Math.abs(rgba[2] - bg[2]) <= tolerance &&
+              rgba[3] > 0;
+
+            if (!nearBackground) continue;
+
+            const offset = (y * width + x) * 4;
+            data[offset + 3] = 0;
+
+            if (x > 0) queue.push([x - 1, y]);
+            if (x < width - 1) queue.push([x + 1, y]);
+            if (y > 0) queue.push([x, y - 1]);
+            if (y < height - 1) queue.push([x, y + 1]);
+          }
+
+          ctx.putImageData(frame, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (processingError) {
+          reject(processingError);
+        }
+      };
+
+      image.onerror = () => reject(new Error('Image load failed'));
+      image.src = this.contentService.getImageUrl(source);
+    });
+  }
+
+  private pixelAt(
+    data: Uint8ClampedArray,
+    width: number,
+    x: number,
+    y: number,
+  ): [number, number, number, number] {
+    const i = (y * width + x) * 4;
+    return [data[i], data[i + 1], data[i + 2], data[i + 3]];
+  }
+
+  private averagePixel(
+    samples: [number, number, number, number][],
+  ): [number, number, number, number] {
+    const sum = samples.reduce(
+      (acc, s) => [acc[0] + s[0], acc[1] + s[1], acc[2] + s[2], acc[3] + s[3]],
+      [0, 0, 0, 0],
+    );
+    const n = samples.length || 1;
+    return [
+      Math.round(sum[0] / n),
+      Math.round(sum[1] / n),
+      Math.round(sum[2] / n),
+      Math.round(sum[3] / n),
+    ];
+  }
+
+  private parseYear(value: string | number | undefined): number | null {
+    const yearValue = String(value ?? '').trim();
+    if (!yearValue) return null;
+    if (!/^\d{4}$/.test(yearValue)) return null;
+    return Number(yearValue);
+  }
+
+  private isCertificationYearRangeValid(cert: Partial<Certification>): boolean {
+    const issued = this.parseYear(cert.issueYear);
+    const expires = this.parseYear(cert.expirationYear);
+
+    if (String(cert.issueYear ?? '').trim() && issued === null) return false;
+    if (String(cert.expirationYear ?? '').trim() && expires === null) return false;
+    if (issued !== null && expires !== null && expires < issued) return false;
+
+    return true;
+  }
+
+  private isUploadedCertImage(url: string | undefined): url is string {
+    return typeof url === 'string' && url.startsWith('/uploads/');
+  }
+
+  private cleanupUploadedCertImage(url: string): void {
+    if (!this.isUploadedCertImage(url)) return;
+    this.pendingCertUploadUrls.delete(url);
+    this.contentService.deleteUploadedImage(url).subscribe({
+      error: (cleanupError) => {
+        void cleanupError;
+      },
+    });
+  }
+
+  private cleanupUnusedPendingCertUploads(): void {
+    const activeUrls = new Set<string>();
+    for (const cert of this.certificationsEdit) {
+      if (this.isUploadedCertImage(cert.badgeLink)) activeUrls.add(cert.badgeLink);
+    }
+    if (this.isUploadedCertImage(this.newCert.badgeLink)) activeUrls.add(this.newCert.badgeLink);
+
+    for (const url of Array.from(this.pendingCertUploadUrls)) {
+      if (!activeUrls.has(url)) this.cleanupUploadedCertImage(url);
+    }
+  }
+
+  private releaseSavedCertUploads(certs: Certification[]): void {
+    for (const cert of certs) {
+      if (this.isUploadedCertImage(cert.badgeLink)) {
+        this.pendingCertUploadUrls.delete(cert.badgeLink);
+      }
+    }
+  }
+
+  private deleteRemovedSavedCertUploads(
+    previousCertifications: Certification[],
+    nextCertifications: Certification[],
+  ): void {
+    const nextUrls = new Set(
+      nextCertifications
+        .map((certification) => certification.badgeLink)
+        .filter((url): url is string => this.isUploadedCertImage(url)),
+    );
+
+    for (const certification of previousCertifications) {
+      if (
+        this.isUploadedCertImage(certification.badgeLink) &&
+        !nextUrls.has(certification.badgeLink)
+      ) {
+        this.cleanupUploadedCertImage(certification.badgeLink);
+      }
+    }
   }
   onIssuerChange(cert: Partial<Certification>): void {
     if (!cert.accentColor || cert.accentColor === '#f5a623')
@@ -1614,6 +1953,7 @@ export class DashboardComponent implements OnInit {
       badgeType: 'auto',
       accentColor: '#0078d4',
       issueYear: String(new Date().getFullYear()),
+      expirationYear: '',
     };
   }
   emptyCompany(): Partial<Company> {

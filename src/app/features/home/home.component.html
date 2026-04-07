@@ -536,95 +536,31 @@
       >
         <!-- Badge area -->
         <div class="cert-badge-wrap">
-          <!-- Auto badge: well-known issuer SVG -->
-          <div
-            class="cert-badge cert-badge-auto"
-            *ngIf="cert.badgeType === 'auto' || !cert.badgeLink"
-            [style.border-color]="cert.accentColor"
-          >
-            <!-- Microsoft 4-square -->
-            <svg *ngIf="cert.issuer === 'Microsoft'" viewBox="0 0 23 23" width="28" height="28">
-              <rect x="1" y="1" width="10" height="10" fill="#f25022" />
-              <rect x="12" y="1" width="10" height="10" fill="#7fba00" />
-              <rect x="1" y="12" width="10" height="10" fill="#00a4ef" />
-              <rect x="12" y="12" width="10" height="10" fill="#ffb900" />
-            </svg>
-            <!-- AWS arc -->
-            <svg
-              *ngIf="cert.issuer === 'AWS' || cert.issuer === 'Amazon'"
-              viewBox="0 0 40 24"
-              width="40"
-              height="24"
-            >
-              <path
-                d="M5 18c-3-2.5-4-6-4-9.5C1 3 5.5 0 11 0c3 0 5.5 1.2 7.5 3"
-                fill="none"
-                stroke="#ff9900"
-                stroke-width="2.2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M35 18c3-2.5 4-6 4-9.5C39 3 34.5 0 29 0c-3 0-5.5 1.2-7.5 3"
-                fill="none"
-                stroke="#ff9900"
-                stroke-width="2.2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M10 14c.5.4 1.1.7 1.8.7.9 0 1.6-.4 2-.9v-3.7c-.4-.5-.9-.7-1.6-.7-1.1 0-1.8.9-1.8 2.3 0 .9.3 1.7.6 2.3h-1zm7.2.7c-2 0-3.4-1.5-3.4-3.8 0-2.2 1.4-3.8 3.4-3.8s3.4 1.5 3.4 3.8c0 2.3-1.4 3.8-3.4 3.8zm0-6.2c-1.1 0-1.8.9-1.8 2.4s.7 2.4 1.8 2.4 1.8-.9 1.8-2.4-.7-2.4-1.8-2.4zm9.2 6l-1.4-5.3-1.4 5.3h-1.6l-2.1-7.3h1.5l1.4 5.2 1.4-5.2h1.6l1.4 5.2 1.4-5.2h1.4l-2.1 7.3h-1.5z"
-                fill="#ff9900"
-              />
-            </svg>
-            <!-- Google G -->
-            <svg *ngIf="cert.issuer === 'Google'" viewBox="0 0 24 24" width="28" height="28">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285f4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34a853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#fbbc05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#ea4335"
-              />
-            </svg>
-            <!-- Default: styled code text -->
-            <span
-              class="cert-code-badge"
-              *ngIf="
-                cert.issuer !== 'Microsoft' &&
-                cert.issuer !== 'AWS' &&
-                cert.issuer !== 'Amazon' &&
-                cert.issuer !== 'Google'
-              "
-              [style.color]="cert.accentColor"
-              >{{ cert.code }}</span
-            >
-          </div>
-          <!-- Uploaded custom badge -->
-          <div
-            class="cert-badge cert-badge-uploaded"
-            *ngIf="cert.badgeType === 'upload' && cert.badgeLink"
-          >
-            <img
-              [src]="contentService.getImageUrl(cert.badgeLink)"
-              [alt]="cert.name"
-              loading="lazy"
-            />
-          </div>
+          <app-certification-badge [cert]="cert" [size]="76"></app-certification-badge>
         </div>
 
         <div class="cert-info">
           <p class="cert-code" [style.color]="cert.accentColor">{{ cert.code }}</p>
           <h3 class="cert-name">{{ cert.name }}</h3>
           <p class="cert-issuer">{{ cert.issuer }} Certified · {{ cert.level }}</p>
-          <p class="cert-year">{{ cert.issueYear }}</p>
+          <p class="cert-year">
+            Issued {{ cert.issueYear }}
+            <span *ngIf="cert.expirationYear"> · Expires {{ cert.expirationYear }}</span>
+          </p>
+          <p
+            class="cert-status"
+            [class.active]="certificationStatus(cert) === 'active'"
+            [class.expired]="certificationStatus(cert) === 'expired'"
+            [class.no-expiry]="certificationStatus(cert) === 'no-expiry'"
+          >
+            {{
+              certificationStatus(cert) === 'active'
+                ? 'Active'
+                : certificationStatus(cert) === 'expired'
+                  ? 'Expired'
+                  : 'No Expiry'
+            }}
+          </p>
         </div>
 
         <div class="cert-footer">
@@ -640,15 +576,35 @@
             *ngIf="cert.credlyLink"
             [href]="externalUrl(cert.credlyLink)"
             target="_blank"
+            rel="noopener noreferrer"
             class="cert-credly-link"
-            title="Verify on Credly"
+            [title]="verificationLabel(cert.credlyLink)"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
-                d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.5 16.5l-1.4 1.4-4.1-4.1-4.1 4.1-1.4-1.4 4.1-4.1-4.1-4.1 1.4-1.4 4.1 4.1 4.1-4.1 1.4 1.4-4.1 4.1 4.1 4.1z"
+                d="M14 3h7v7"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M10 14L21 3"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               />
             </svg>
-            Verify on Credly
+            <span class="cert-verified-dot" aria-hidden="true"></span>
+            {{ verificationLabel(cert.credlyLink) }}
           </a>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '@env/environment';
 import { PortfolioContent, SiteSettings, Testimonial } from '@core/models';
+import { environment } from '@env/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,15 @@ export class ContentService {
   getImageUrl(val: string | undefined): string {
     if (!val) return '';
     if (val.startsWith('data:') || val.startsWith('http')) return val;
+
+    if (val.startsWith('/uploads/')) {
+      if (environment.api.baseUrl.startsWith('http')) {
+        return environment.api.baseUrl.replace(/\/api\/?$/, '') + val;
+      }
+
+      return val;
+    }
+
     return environment.assets.baseUrl + val;
   }
 
@@ -58,6 +67,12 @@ export class ContentService {
   // Image upload (returns { url: '/uploads/filename.ext' })
   uploadImage(fileName: string, fileData: string): Observable<{ url: string }> {
     return this.http.post<{ url: string }>(this.base + '/upload-image', { fileName, fileData });
+  }
+
+  deleteUploadedImage(url: string): Observable<void> {
+    return this.http.request<void>('DELETE', this.base + '/upload-image', {
+      body: { url },
+    });
   }
 
   // Reorder

@@ -97,7 +97,6 @@
         <span class="dirty-dot" *ngIf="dirtyTabs.has('account')"></span>
       </button>
     </nav>
-
     <div class="sidebar-footer">
       <button
         class="theme-btn"
@@ -406,34 +405,26 @@
           <div class="cert-admin-topbar">
             <span class="drag-handle" title="Drag to reorder"></span>
             <div class="cert-badge-preview">
-              <!-- Auto badge (well-known issuer) -->
-              <div
-                class="cert-badge-auto"
-                *ngIf="cert.badgeType === 'auto'"
-                [style.border-color]="cert.accentColor"
+              <app-certification-badge [cert]="cert" [size]="72"></app-certification-badge>
+              <button
+                *ngIf="cert.badgeType === 'upload'"
+                class="cert-badge-remove-btn"
+                (click)="setBadgeType(cert, 'default')"
+                title="Remove uploaded badge"
               >
-                <div
-                  class="cert-badge-logo"
-                  [innerHTML]="certBadge.getIssuerLogoSVG(cert.issuer)"
-                ></div>
-                <div class="cert-badge-code" [style.color]="cert.accentColor">{{ cert.code }}</div>
-              </div>
-              <!-- Uploaded badge -->
-              <div class="cert-badge-img" *ngIf="cert.badgeType === 'upload' && cert.badgeLink">
-                <img [src]="cert.badgeLink" [alt]="cert.name" />
-              </div>
-              <!-- Default fallback badge -->
-              <div
-                class="cert-badge-default"
-                *ngIf="cert.badgeType === 'default'"
-                [style.border-color]="cert.accentColor"
-                [style.background]="cert.accentColor + '18'"
-              >
-                <span class="cert-default-icon">🏅</span>
-                <span class="cert-default-code" [style.color]="cert.accentColor">{{
-                  cert.code || cert.name.substring(0, 8)
-                }}</span>
-              </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  width="9"
+                  height="9"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+                  />
+                </svg>
+              </button>
             </div>
             <div
               class="cert-admin-level-badge"
@@ -443,11 +434,31 @@
             >
               {{ certBadge.getLevelLabel(cert.level) }}
             </div>
-            <button class="delete-row-btn ml-auto" (click)="deleteCert(cert.id)">✕</button>
+            <button
+              class="delete-row-btn ml-auto"
+              (click)="deleteCert(cert.id)"
+              title="Delete certification"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                />
+                <path
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                />
+              </svg>
+            </button>
           </div>
 
           <!-- Fields -->
-          <div class="form-row">
+          <div class="form-row cert-title-row">
             <div class="form-group">
               <label>Certification Name</label><input type="text" [(ngModel)]="cert.name" />
             </div>
@@ -456,7 +467,7 @@
               ><input type="text" [(ngModel)]="cert.code" placeholder="AZ-400" maxlength="12" />
             </div>
           </div>
-          <div class="form-row">
+          <div class="form-row cert-meta-row">
             <div class="form-group">
               <label>Issuer</label>
               <select
@@ -491,25 +502,47 @@
                 <option value="Specialty">Specialty</option>
               </select>
             </div>
+          </div>
+
+          <div class="form-row cert-years-row">
             <div class="form-group xs">
-              <label>Year</label
-              ><input type="text" [(ngModel)]="cert.issueYear" maxlength="4" placeholder="2024" />
+              <label>Issued</label
+              ><input
+                type="text"
+                [(ngModel)]="cert.issueYear"
+                maxlength="4"
+                pattern="[0-9]{4}"
+                inputmode="numeric"
+                title="Enter a 4-digit year"
+                placeholder="2024"
+              />
+            </div>
+            <div class="form-group xs">
+              <label>Expires</label
+              ><input
+                type="text"
+                [(ngModel)]="cert.expirationYear"
+                maxlength="4"
+                pattern="[0-9]{4}"
+                inputmode="numeric"
+                title="Enter a 4-digit year"
+                placeholder="2027"
+              />
             </div>
             <div class="form-group xs">
               <label>Color</label><input type="color" [(ngModel)]="cert.accentColor" />
             </div>
           </div>
 
-          <!-- Credly URL -->
+          <!-- Verification URL -->
           <div class="form-group">
             <label
-              >🔗 Credly Badge URL
-              <small>(paste your Credly badge link so visitors can verify)</small></label
+              >🔗 Verification URL <small>(Credly or Microsoft verification link)</small></label
             >
             <input
               type="url"
               [(ngModel)]="cert.credlyLink"
-              placeholder="https://www.credly.com/badges/your-badge-id"
+              placeholder="https://www.credly.com/badges/... or https://learn.microsoft.com/..."
             />
           </div>
 
@@ -529,21 +562,37 @@
             >
               🤖 Auto
             </button>
-            <label class="badge-type-btn" [class.active]="cert.badgeType === 'upload'">
+            <button
+              type="button"
+              class="badge-type-btn"
+              [class.active]="cert.badgeType === 'upload'"
+              (click)="triggerFileInput(cert.id)"
+            >
               📤 Upload
-              <input
-                type="file"
-                accept="image/*"
-                style="display: none"
-                (change)="onCertBadgeUpload(cert, $event)"
-              />
-            </label>
+            </button>
+            <input
+              [id]="'badge-upload-' + cert.id"
+              type="file"
+              accept="image/*"
+              style="display: none"
+              (change)="onCertBadgeUpload(cert, $event)"
+            />
             <button
               class="badge-type-btn"
               [class.active]="cert.badgeType === 'default'"
               (click)="setBadgeType(cert, 'default')"
             >
               🎨 Default
+            </button>
+            <button
+              type="button"
+              class="badge-type-btn"
+              *ngIf="cert.badgeType === 'upload' && cert.badgeLink"
+              [disabled]="isBgRemovalRunning(cert)"
+              (click)="removeUploadedBadgeBackground(cert)"
+              title="Try to remove the background from uploaded badge"
+            >
+              {{ isBgRemovalRunning(cert) ? '⏳ Removing...' : '🪄 Remove BG' }}
             </button>
           </div>
         </div>
@@ -628,8 +677,26 @@
             <div class="testi-stars-sm">
               <span *ngFor="let s of ratingStars(t.rating)">★</span>
             </div>
-            <button class="delete-row-btn" (click)="deleteTestimonial(t.id)" title="Delete">
-              ✕
+            <button
+              class="delete-row-btn"
+              (click)="deleteTestimonial(t.id)"
+              title="Delete testimonial"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                />
+                <path
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                />
+              </svg>
             </button>
           </div>
 
@@ -788,7 +855,23 @@
             <button class="btn btn-outline btn-xs" (click)="toggleEditBlog(post.id)">
               {{ editingBlogId === post.id ? 'Collapse' : 'Edit' }}
             </button>
-            <button class="delete-row-btn" (click)="deleteBlogPost(post.id)">✕</button>
+            <button class="delete-row-btn" (click)="deleteBlogPost(post.id)" title="Delete post">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                />
+                <path
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                />
+              </svg>
+            </button>
           </div>
 
           <div class="blog-admin-editor" [class.open]="editingBlogId === post.id">
@@ -1948,8 +2031,26 @@
               >
                 ★
               </button>
-              <button class="del-btn" (click)="deleteMessage(msg.id, $event)" title="Delete">
-                ✕
+              <button
+                class="del-btn"
+                (click)="deleteMessage(msg.id, $event)"
+                title="Delete message"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  width="13"
+                  height="13"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                  />
+                  <path
+                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -2212,7 +2313,21 @@
                     (click)="deleteCompanyProject(co.id, proj.id)"
                     title="Delete project"
                   >
-                    ✕
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 16 16"
+                      width="13"
+                      height="13"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                      />
+                      <path
+                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                      />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -2297,8 +2412,26 @@
             <label class="pp-featured-toggle" title="Show star badge on portfolio">
               <input type="checkbox" [(ngModel)]="p.featured" /> ★
             </label>
-            <button class="delete-row-btn" (click)="deletePersonalProject(p.id)" title="Delete">
-              ✕
+            <button
+              class="delete-row-btn"
+              (click)="deletePersonalProject(p.id)"
+              title="Delete project"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
+                />
+                <path
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
+                />
+              </svg>
             </button>
           </div>
 
@@ -2476,7 +2609,20 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add New Skill</h2>
-      <button (click)="showAddSkill = false">✕</button>
+      <button (click)="showAddSkill = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
     <div class="form-group">
       <label>Name</label><input type="text" [(ngModel)]="newSkill.name" name="ns_name" />
@@ -2541,7 +2687,20 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add Experience</h2>
-      <button (click)="showAddExp = false">✕</button>
+      <button (click)="showAddExp = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -2581,7 +2740,20 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add Company</h2>
-      <button (click)="showAddCompany = false">✕</button>
+      <button (click)="showAddCompany = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -2637,7 +2809,20 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add Side Project</h2>
-      <button (click)="showAddPersonal = false">✕</button>
+      <button (click)="showAddPersonal = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
     <div class="form-row form-row-3">
       <div class="form-group">
@@ -2714,42 +2899,33 @@
 </div>
 
 <!-- ── Add Certification Modal ───────────────────────────────────────────────── -->
-<div class="modal-overlay" *ngIf="showAddCert" (click)="showAddCert = false">
+<div class="modal-overlay" *ngIf="showAddCert" (click)="closeAddCertModal()">
   <div class="modal modal-wide" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add Certification</h2>
-      <button (click)="showAddCert = false">✕</button>
+      <button (click)="closeAddCertModal()" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
 
     <!-- Live badge preview -->
     <div class="cert-modal-preview">
-      <div
-        class="cert-badge-auto"
-        *ngIf="newCert.badgeType === 'auto' && certBadge.isKnownIssuer(newCert.issuer || '')"
-        [style.border-color]="newCert.accentColor"
-      >
-        <div
-          class="cert-badge-logo"
-          [innerHTML]="certBadge.getIssuerLogoSVG(newCert.issuer || '')"
-        ></div>
-        <div class="cert-badge-code" [style.color]="newCert.accentColor">
-          {{ newCert.code || 'CODE' }}
-        </div>
-      </div>
-      <div class="cert-badge-img" *ngIf="newCert.badgeType === 'upload' && certUploadPreview">
-        <img [src]="certUploadPreview" alt="Badge preview" />
-      </div>
-      <div
-        class="cert-badge-default"
-        *ngIf="newCert.badgeType === 'default'"
-        [style.border-color]="newCert.accentColor"
-        [style.background]="newCert.accentColor + '18'"
-      >
-        <span class="cert-default-icon">🏅</span>
-        <span class="cert-default-code" [style.color]="newCert.accentColor">{{
-          newCert.code || 'CODE'
-        }}</span>
-      </div>
+      <app-certification-badge
+        [cert]="newCert"
+        [previewSrc]="certUploadPreview"
+        [size]="72"
+      ></app-certification-badge>
       <p class="cert-preview-label">Live Preview</p>
     </div>
 
@@ -2798,9 +2974,32 @@
           <option value="Specialty">Specialty</option>
         </select>
       </div>
+    </div>
+
+    <div class="form-row cert-years-row">
       <div class="form-group xs">
-        <label>Year</label
-        ><input type="text" [(ngModel)]="newCert.issueYear" placeholder="2024" maxlength="4" />
+        <label>Issued</label
+        ><input
+          type="text"
+          [(ngModel)]="newCert.issueYear"
+          placeholder="2024"
+          maxlength="4"
+          pattern="[0-9]{4}"
+          inputmode="numeric"
+          title="Enter a 4-digit year"
+        />
+      </div>
+      <div class="form-group xs">
+        <label>Expires</label
+        ><input
+          type="text"
+          [(ngModel)]="newCert.expirationYear"
+          placeholder="2027"
+          maxlength="4"
+          pattern="[0-9]{4}"
+          inputmode="numeric"
+          title="Enter a 4-digit year"
+        />
       </div>
       <div class="form-group xs">
         <label>Color</label><input type="color" [(ngModel)]="newCert.accentColor" />
@@ -2808,11 +3007,13 @@
     </div>
 
     <div class="form-group">
-      <label>🔗 Credly URL <small>(optional — lets visitors verify your badge)</small></label>
+      <label
+        >🔗 Verification URL <small>(optional — Credly or Microsoft verification)</small></label
+      >
       <input
         type="url"
         [(ngModel)]="newCert.credlyLink"
-        placeholder="https://www.credly.com/badges/..."
+        placeholder="https://www.credly.com/badges/... or https://learn.microsoft.com/..."
       />
     </div>
 
@@ -2822,7 +3023,7 @@
       <button
         class="badge-type-btn"
         [class.active]="newCert.badgeType === 'auto'"
-        (click)="setBadgeType(newCert, 'auto'); certUploadPreview = ''"
+        (click)="setBadgeType(newCert, 'auto')"
         [disabled]="!certBadge.isKnownIssuer(newCert.issuer || '')"
         [title]="
           certBadge.isKnownIssuer(newCert.issuer || '')
@@ -2846,16 +3047,24 @@
       <button
         class="badge-type-btn"
         [class.active]="newCert.badgeType === 'default'"
-        (click)="setBadgeType(newCert, 'default'); certUploadPreview = ''"
+        (click)="setBadgeType(newCert, 'default')"
       >
         🎨 Styled Default
+      </button>
+      <button
+        type="button"
+        class="badge-type-btn"
+        *ngIf="newCert.badgeType === 'upload' && (newCert.badgeLink || certUploadPreview)"
+        [disabled]="isBgRemovalRunning(newCert)"
+        (click)="removeUploadedBadgeBackground(newCert)"
+        title="Try to remove the background from uploaded badge"
+      >
+        {{ isBgRemovalRunning(newCert) ? '⏳ Removing...' : '🪄 Remove BG' }}
       </button>
     </div>
 
     <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" (click)="showAddCert = false; certUploadPreview = ''">
-        Cancel
-      </button>
+      <button class="btn btn-outline btn-sm" (click)="closeAddCertModal()">Cancel</button>
       <button class="btn btn-primary btn-sm" (click)="submitAddCert()">Add Certification</button>
     </div>
   </div>
@@ -2866,7 +3075,20 @@
   <div class="modal modal-wide" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>Add Testimonial</h2>
-      <button (click)="showAddTestimonial = false">✕</button>
+      <button (click)="showAddTestimonial = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
 
     <div class="form-row form-row-3">
@@ -2945,7 +3167,20 @@
   <div class="modal modal-wide" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>New Blog Post</h2>
-      <button (click)="showAddBlog = false">✕</button>
+      <button (click)="showAddBlog = false" title="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+          />
+        </svg>
+      </button>
     </div>
 
     <div class="form-row form-row-3">
