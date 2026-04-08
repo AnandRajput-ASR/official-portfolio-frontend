@@ -14,6 +14,7 @@ import {
   Message,
   PersonalProject,
   PortfolioContent,
+  ProjectStatus,
   SiteSettings,
   Skill,
   Stat,
@@ -32,6 +33,7 @@ import {
   ConfirmConfig,
   ConfirmDialogComponent,
 } from '@shared/components/confirm-dialog/confirm-dialog.component';
+import { CustomSliderComponent } from '@shared/components/custom-slider.component';
 import { ToastComponent, ToastService } from '@shared/components/toast/toast.component';
 
 type ActiveTab =
@@ -60,6 +62,7 @@ type ActiveTab =
     ToastComponent,
     ConfirmDialogComponent,
     CertificationBadgeComponent,
+    CustomSliderComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
@@ -110,6 +113,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showAddCompanyProject: string | null = null;
   newCompany: Partial<Company> = this.emptyCompany();
   newCompanyProject: Partial<CompanyProject> = this.emptyCompanyProject();
+
+  // ── Companies extras ──────────────────────────────────────────────────────
+  companyShortcutsVisible = false;
+  autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  autoSavedAt: Date | null = null;
+  autoSaving = false;
+  collapsedProjectRows = new Set<string>();
   showAddPersonal = false;
   newPersonal: Partial<PersonalProject> = this.emptyPersonal();
   showAddSkill = false;
@@ -393,6 +403,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           { value: '4', label: 'Projects' },
         ],
         cardSkills: ['Angular', 'TypeScript', 'Node.js', 'Azure DevOps', 'AWS', 'PostgreSQL'],
+        extraSkills: ['Git', 'VS Code', 'Postman', 'Grafana', 'QuickSight', 'SAP Integration'],
       },
       about: {
         heading: 'I build things that enterprises trust.',
@@ -465,16 +476,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // ── SKILLS ────────────────────────────────────────────────────────────────
   saveSkills(): void {
+    const loaderKey = 'admin-skills-save';
+    const normalizedSkills = this.skillsEdit.map((skill, index) =>
+      this.normalizeSkill(skill, index),
+    );
+    const validationError = this.validateSkills(normalizedSkills);
+    if (validationError) {
+      this.toast.error(validationError);
+      return;
+    }
+
+    this.skillsEdit = normalizedSkills;
     this.saving = true;
-    this.adminService.updateSkills(this.skillsEdit).subscribe({
+    this.loadingService.start(loaderKey);
+    this.adminService.updateSkills(normalizedSkills).subscribe({
       next: () => {
-        this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
+        this.content!.skills = JSON.parse(JSON.stringify(normalizedSkills));
         this.saving = false;
+        this.loadingService.stop(loaderKey);
         this.clearDirty();
         this.toast.success('Skills saved!');
       },
       error: () => {
         this.saving = false;
+        this.loadingService.stop(loaderKey);
         this.toast.error('Save failed');
       },
     });
@@ -510,20 +535,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
   submitAddSkill(): void {
-    const skill: Skill = {
-      id: `skill_${Date.now()}`,
-      name: this.newSkill.name || '',
-      icon: this.newSkill.icon || '⚡',
-      accentColor: this.newSkill.accentColor || '#f5a623',
-      description: this.newSkill.description || '',
-      tags: this.newSkill.tags || [],
-      proficiency: this.newSkill.proficiency || 80,
-      yearsExp: this.newSkill.yearsExp || '1+',
-      displayOrder: this.skillsEdit.length,
-    };
+    const skill = this.normalizeSkill(
+      {
+        id: `skill_${Date.now()}`,
+        ...this.newSkill,
+      },
+      this.skillsEdit.length,
+    );
+    const validationError = this.validateSkill(skill, 'New skill');
+    if (validationError) {
+      this.toast.error(validationError);
+      return;
+    }
+
     this.adminService.addSkill(skill).subscribe({
       next: (res) => {
-        this.skillsEdit.push(res.data || skill);
+        const savedSkill = this.normalizeSkill(res.data || skill, this.skillsEdit.length);
+        this.skillsEdit.push(savedSkill);
         this.content!.skills = JSON.parse(JSON.stringify(this.skillsEdit));
         this.showAddSkill = false;
         this.newSkill = this.emptySkill();
@@ -533,11 +561,133 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  skillLevel(proficiency: number | null | undefined): string {
+    const value = this.normalizeSkillProficiency(proficiency);
+    if (value >= 90) return 'Expert';
+    if (value >= 75) return 'Advanced';
+    if (value >= 60) return 'Strong';
+    return 'Growing';
+  }
+
+  skillLevelClass(proficiency: number | null | undefined): string {
+    const value = this.normalizeSkillProficiency(proficiency);
+    if (value >= 90) return 'elite';
+    if (value >= 75) return 'advanced';
+    if (value >= 60) return 'strong';
+    return 'growing';
+  }
+
+  skillExperienceLabel(value: string | null | undefined): string {
+    const normalized = this.normalizeSkillYears(value);
+    if (!normalized) return 'Experience optional';
+    if (/^1$/.test(normalized)) return '1 year';
+    if (/^\d+$/.test(normalized)) return `${normalized} years`;
+    if (/^\d+\+$/.test(normalized)) return `${normalized} years`;
+    return /years?|yrs?/i.test(normalized) ? normalized : `${normalized} years`;
+  }
+
+  private validateSkills(skills: Partial<Skill>[]): string | null {
+    if (!skills.length) return 'Add at least one skill before saving.';
+    for (let index = 0; index < skills.length; index += 1) {
+      const error = this.validateSkill(skills[index], `Skill ${index + 1}`);
+      if (error) return error;
+    }
+    return null;
+  }
+
+  private validateSkill(skill: Partial<Skill>, fallbackLabel: string): string | null {
+    const name = this.normalizeSkillName(skill.name);
+    if (!name) return `${fallbackLabel} needs a name.`;
+    if (!this.normalizeSkillDescription(skill.description)) {
+      return `${name} needs a short description.`;
+    }
+    if (!this.normalizeSkillTags(skill.tags).length) {
+      return `${name} needs at least one tag.`;
+    }
+    if (!this.isValidSkillColor(skill.accentColor)) {
+      return `${name} needs a valid hex color like #f5a623.`;
+    }
+    if (!this.isValidSkillYears(skill.yearsExp)) {
+      return `${name} has invalid experience format. Use examples like 3, 5+, or 1-2.`;
+    }
+    return null;
+  }
+
+  private normalizeSkill(skill: Partial<Skill>, displayOrder: number): Skill {
+    return {
+      id: String(skill.id || `skill_${Date.now()}_${displayOrder}`),
+      name: this.normalizeSkillName(skill.name),
+      icon: String(skill.icon || '⚡').trim() || '⚡',
+      accentColor: String(skill.accentColor || '#f5a623').trim() || '#f5a623',
+      description: this.normalizeSkillDescription(skill.description),
+      tags: this.normalizeSkillTags(skill.tags),
+      proficiency: this.normalizeSkillProficiency(skill.proficiency),
+      yearsExp: this.normalizeSkillYears(skill.yearsExp),
+      displayOrder,
+    };
+  }
+
+  private normalizeSkillName(value: string | null | undefined): string {
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeSkillDescription(value: string | null | undefined): string {
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeSkillTags(tags: string[] | null | undefined): string[] {
+    const seen = new Set<string>();
+    const normalized: string[] = [];
+    for (const rawTag of tags || []) {
+      const tag = String(rawTag || '').trim();
+      if (!tag) continue;
+      const key = tag.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      normalized.push(tag);
+    }
+    return normalized;
+  }
+
+  private normalizeSkillYears(value: string | null | undefined): string {
+    return String(value || '')
+      .replace(/\s*(years?|yrs?)\.?$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeSkillProficiency(value: number | string | null | undefined): number {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return 80;
+    const clamped = Math.min(100, Math.max(10, numericValue));
+    return Math.round(clamped / 5) * 5;
+  }
+
+  private isValidSkillColor(value: string | null | undefined): boolean {
+    const color = String(value || '').trim();
+    return /^#[0-9a-fA-F]{6}$/.test(color);
+  }
+
+  private isValidSkillYears(value: string | null | undefined): boolean {
+    const years = this.normalizeSkillYears(value);
+    if (!years) return true;
+    return /^\d{1,2}(\+)?$/.test(years) || /^\d{1,2}-\d{1,2}$/.test(years);
+  }
+
   // ── COMPANIES ─────────────────────────────────────────────────────────────
   toggleExpandCompany(id: string): void {
     this.expandedCompany = this.expandedCompany === id ? null : id;
   }
   saveCompanies(): void {
+    if (this.companiesEdit.some((co) => this.hasInvalidDateRange(co))) {
+      this.toast.error('Fix invalid company date ranges before saving.');
+      return;
+    }
+
     this.saving = true;
     this.adminService.updateCompanies(this.companiesEdit).subscribe({
       next: () => {
@@ -624,6 +774,369 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   removeCompanyProjectTech(p: CompanyProject, tech: string): void {
     p.tech = p.tech.filter((t) => t !== tech);
+  }
+
+  // Validation helpers
+  isCompanyValid(co: Company): boolean {
+    return !!(co.name && co.name.trim() && co.projects.length > 0);
+  }
+
+  canSaveCompany(co: Company): boolean {
+    return !!(co.name && co.name.trim().length > 0);
+  }
+
+  getCompanyProjectCount(co: Company): number {
+    return co.projects.length;
+  }
+
+  private projectRowKey(companyId: string, projectId: string): string {
+    return `${companyId}::${projectId}`;
+  }
+
+  toggleProjectCollapsed(companyId: string, projectId: string): void {
+    const key = this.projectRowKey(companyId, projectId);
+    if (this.collapsedProjectRows.has(key)) this.collapsedProjectRows.delete(key);
+    else this.collapsedProjectRows.add(key);
+  }
+
+  isProjectCollapsed(companyId: string, projectId: string): boolean {
+    return this.collapsedProjectRows.has(this.projectRowKey(companyId, projectId));
+  }
+
+  duplicateCompany(co: Company): void {
+    const duplicate: Partial<Company> = {
+      ...JSON.parse(JSON.stringify(co)),
+      name: co.name + ' (Copy)',
+      id: 'co_' + Date.now(),
+      displayOrder: this.companiesEdit.length,
+    };
+    this.newCompany = duplicate;
+    this.showAddCompany = true;
+  }
+
+  async moveProjectToCompany(
+    projectId: string,
+    fromCompanyId: string,
+    toCompanyId: string,
+  ): Promise<void> {
+    const fromCompany = this.companiesEdit.find((c) => c.id === fromCompanyId);
+    const toCompany = this.companiesEdit.find((c) => c.id === toCompanyId);
+
+    if (!fromCompany || !toCompany) return;
+
+    const project = fromCompany.projects.find((p) => p.id === projectId);
+    if (!project) return;
+
+    fromCompany.projects = fromCompany.projects.filter((p) => p.id !== projectId);
+    toCompany.projects.push(project);
+    this.markDirty();
+  }
+
+  // ── FEATURE 1: Project Status ──────────────────────────────────────────────
+  readonly projectStatuses: { value: ProjectStatus; label: string; icon: string }[] = [
+    { value: null, label: 'No Status', icon: '—' },
+    { value: 'completed', label: 'Completed', icon: '✅' },
+    { value: 'in-progress', label: 'In Progress', icon: '🔄' },
+    { value: 'planned', label: 'Planned', icon: '📅' },
+    { value: 'archived', label: 'Archived', icon: '📦' },
+  ];
+
+  projectStatusLabel(status?: ProjectStatus): string {
+    return this.projectStatuses.find((s) => s.value === (status ?? null))?.label ?? 'No Status';
+  }
+
+  projectStatusIcon(status?: ProjectStatus): string {
+    return this.projectStatuses.find((s) => s.value === (status ?? null))?.icon ?? '—';
+  }
+
+  // ── FEATURE 2: Tech Stack Aggregation ────────────────────────────────────
+  getUniqueTechStack(co: Company): string[] {
+    const all = co.projects.flatMap((p) => p.tech);
+    return [...new Set(all)].sort((a, b) => {
+      const countA = co.projects.filter((p) => p.tech.includes(a)).length;
+      const countB = co.projects.filter((p) => p.tech.includes(b)).length;
+      return countB - countA;
+    });
+  }
+
+  getTechProjectCount(co: Company, tech: string): number {
+    return co.projects.filter((p) => p.tech.includes(tech)).length;
+  }
+
+  // ── FEATURE 3: Duration Calculator ───────────────────────────────────────
+  calcTenure(co: Company): string {
+    if (!co.startDate) return '';
+    const [startY, startM] = co.startDate.split('-').map(Number);
+    let endY: number, endM: number;
+    if (co.current || !co.endDate) {
+      const now = new Date();
+      endY = now.getFullYear();
+      endM = now.getMonth() + 1;
+    } else {
+      [endY, endM] = co.endDate.split('-').map(Number);
+    }
+    let months = (endY - startY) * 12 + (endM - startM);
+    if (months < 0) months = 0;
+    const years = Math.floor(months / 12);
+    const rem = months % 12;
+    if (years === 0) return `${rem}mo`;
+    if (rem === 0) return `${years}y`;
+    return `${years}y ${rem}mo`;
+  }
+
+  private monthStamp(value: string | undefined): number | null {
+    if (!value || !/^\d{4}-\d{2}$/.test(value)) return null;
+    const [year, month] = value.split('-').map(Number);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
+    return year * 12 + month;
+  }
+
+  hasInvalidDateRange(co: Company): boolean {
+    const start = this.monthStamp(co.startDate);
+    const end = this.monthStamp(co.endDate);
+    if (start === null || end === null) return false;
+    return end < start;
+  }
+
+  onCompanyStartDateChange(co: Company): void {
+    this.applyDefaultPeriod(co);
+    this.scheduleAutoSave();
+  }
+
+  onCompanyEndDateChange(co: Company): void {
+    this.applyDefaultPeriod(co);
+    this.scheduleAutoSave();
+  }
+
+  onCompanyCurrentToggle(co: Company): void {
+    if (co.current) co.endDate = '';
+    this.applyDefaultPeriod(co);
+    this.scheduleAutoSave();
+  }
+
+  isValidWebsite(url: string | undefined): boolean {
+    const value = String(url || '').trim();
+    if (!value) return true;
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  }
+
+  getDuplicateProjectTitles(co: Company): string[] {
+    const counts = new Map<string, number>();
+    for (const proj of co.projects) {
+      const key = (proj.title || '').trim().toLowerCase();
+      if (!key) continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .filter(([, count]) => count > 1)
+      .map(([key]) => key);
+  }
+
+  isDuplicateProjectTitle(co: Company, proj: CompanyProject): boolean {
+    const key = (proj.title || '').trim().toLowerCase();
+    if (!key) return false;
+    return this.getDuplicateProjectTitles(co).includes(key);
+  }
+
+  isProjectDetailsMissing(proj: CompanyProject): boolean {
+    const noDescription = !(proj.description || '').trim();
+    const noTech = !proj.tech || proj.tech.length === 0;
+    return noDescription || noTech;
+  }
+
+  getProjectsMissingDetailsCount(co: Company): number {
+    return co.projects.filter((proj) => this.isProjectDetailsMissing(proj)).length;
+  }
+
+  impactScore(impact: string | undefined): number {
+    const text = String(impact || '').trim();
+    if (!text) return 0;
+
+    let score = 25;
+    if (text.length >= 30) score += 15;
+    if (text.length >= 60) score += 10;
+    if (/\d/.test(text)) score += 20;
+    if (/%|\$|kpi|ms|sec|users?|revenue|latency|uptime|conversion|roi/i.test(text)) score += 15;
+    if (
+      /(reduced|increased|improved|optimized|cut|saved|boosted|delivered|automated|scaled)/i.test(
+        text,
+      )
+    )
+      score += 15;
+    if (/(by\s+\d+|\d+\s*%)/i.test(text)) score += 10;
+
+    return Math.min(100, score);
+  }
+
+  impactStrengthLabel(impact: string | undefined): string {
+    const score = this.impactScore(impact);
+    if (score >= 75) return 'Strong';
+    if (score >= 45) return 'Okay';
+    return 'Weak';
+  }
+
+  impactStrengthClass(impact: string | undefined): string {
+    const score = this.impactScore(impact);
+    if (score >= 75) return 'strong';
+    if (score >= 45) return 'okay';
+    return 'weak';
+  }
+
+  openMonthPicker(e: Event): void {
+    const input = e.target as HTMLInputElement | null;
+    if (!input || input.type !== 'month' || input.disabled) return;
+    const pickerInput = input as HTMLInputElement & { showPicker?: () => void };
+    try {
+      pickerInput.showPicker?.();
+    } catch {
+      // no-op: browser will still allow manual keyboard date entry
+    }
+  }
+
+  // ── FEATURE 5: Auto-save ──────────────────────────────────────────────────
+  scheduleAutoSave(): void {
+    if (this.companiesEdit.some((co) => this.hasInvalidDateRange(co))) return;
+
+    if (this.autoSaveTimer) clearTimeout(this.autoSaveTimer);
+    this.autoSaveTimer = setTimeout(() => {
+      this.autoSaving = true;
+      this.adminService.updateCompanies(this.companiesEdit).subscribe({
+        next: () => {
+          this.content!.companies = JSON.parse(JSON.stringify(this.companiesEdit));
+          this.autoSavedAt = new Date();
+          this.autoSaving = false;
+        },
+        error: () => {
+          this.autoSaving = false;
+        },
+      });
+    }, 3000);
+  }
+
+  autoSavedLabel(): string {
+    if (this.autoSaving) return '⏳ Saving...';
+    if (!this.autoSavedAt) return '';
+    const diffMs = Date.now() - this.autoSavedAt.getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return '✓ Saved just now';
+    if (mins === 1) return '✓ Saved 1 min ago';
+    return `✓ Saved ${mins} mins ago`;
+  }
+
+  // ── FEATURE 6: Keyboard Shortcuts ────────────────────────────────────────
+  @HostListener('keydown.e', ['$event'])
+  onKeyE(e: Event): void {
+    const t = (e as KeyboardEvent).target as HTMLElement;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') return;
+    if (this.activeTab !== 'companies') return;
+    const first = this.companiesEdit[0];
+    if (first) this.toggleExpandCompany(first.id);
+  }
+
+  @HostListener('keydown.a', ['$event'])
+  onKeyA(e: Event): void {
+    const t = (e as KeyboardEvent).target as HTMLElement;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') return;
+    if (this.activeTab !== 'companies') return;
+    if (this.expandedCompany) this.showAddCompanyProject = this.expandedCompany;
+  }
+
+  @HostListener('keydown.shift.?', ['$event'])
+  onKeyHelp(e: Event): void {
+    const t = (e as KeyboardEvent).target as HTMLElement;
+    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') return;
+    if (this.activeTab !== 'companies') return;
+    this.companyShortcutsVisible = !this.companyShortcutsVisible;
+  }
+
+  // ── FEATURE 7: Project Impact Metrics ────────────────────────────────────
+  getCompletedCount(co: Company): number {
+    return co.projects.filter((p) => !p.status || p.status === 'completed').length;
+  }
+
+  getInProgressCount(co: Company): number {
+    return co.projects.filter((p) => p.status === 'in-progress').length;
+  }
+
+  getProjectsWithImpact(co: Company): number {
+    return co.projects.filter((p) => p.impact && p.impact.trim()).length;
+  }
+
+  getCompletionRate(co: Company): number {
+    if (!co.projects.length) return 0;
+    return Math.round((this.getCompletedCount(co) / co.projects.length) * 100);
+  }
+
+  // ── FEATURE 9: Bulk Export ────────────────────────────────────────────────
+  exportCompanyJson(co: Company): void {
+    const data = JSON.stringify(co, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${co.name.toLowerCase().replace(/\s+/g, '-')}-company.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  copyTechStack(co: Company): void {
+    const stack = this.getUniqueTechStack(co).join(', ');
+    navigator.clipboard.writeText(stack).then(() => {
+      this.toast.success('Tech stack copied!');
+    });
+  }
+
+  copyResumeSection(co: Company): void {
+    const lines = [
+      `${co.role} — ${co.name}`,
+      co.period,
+      '',
+      co.description,
+      '',
+      'Key Projects:',
+      ...co.projects.map(
+        (p) => `• ${p.title}: ${p.description}${p.tech.length ? ` [${p.tech.join(', ')}]` : ''}`,
+      ),
+    ];
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      this.toast.success('Resume section copied!');
+    });
+  }
+
+  // ── FEATURE 10: Smart Defaults ────────────────────────────────────────────
+  applyDefaultPeriod(co: Company): void {
+    if (!co.period && co.startDate) {
+      const [y, m] = co.startDate.split('-').map(Number);
+      const monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      const start = `${monthNames[m - 1]} ${y}`;
+      co.period = co.current
+        ? `${start} — Present`
+        : co.endDate
+          ? (() => {
+              const [ey, em] = co.endDate!.split('-').map(Number);
+              return `${start} — ${monthNames[em - 1]} ${ey}`;
+            })()
+          : `${start} — Present`;
+      this.markDirty();
+    }
   }
 
   // ── PERSONAL PROJECTS ────────────────────────────────────────────────────
@@ -1756,6 +2269,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.settingsEdit.hero.cardSkills = this.settingsEdit.hero.cardSkills.filter((x) => x !== s);
     this.markDirty();
   }
+  addExtraSkill(e: Event): void {
+    const v = (e.target as HTMLInputElement).value.trim();
+    if (!this.settingsEdit.hero.extraSkills) this.settingsEdit.hero.extraSkills = [];
+    if (v && !this.settingsEdit.hero.extraSkills.includes(v)) {
+      this.settingsEdit.hero.extraSkills.push(v);
+      (e.target as HTMLInputElement).value = '';
+      this.markDirty();
+    }
+  }
+  removeExtraSkill(s: string): void {
+    this.settingsEdit.hero.extraSkills = this.settingsEdit.hero.extraSkills.filter((x) => x !== s);
+    this.markDirty();
+  }
   addTickerItem(e: Event): void {
     const v = (e.target as HTMLInputElement).value.trim();
     if (!this.settingsEdit.ticker) this.settingsEdit.ticker = { items: [] };
@@ -1967,10 +2493,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
       current: false,
       description: '',
       projects: [],
+      website: '',
+      teamSize: '',
+      startDate: '',
+      endDate: '',
     };
   }
   emptyCompanyProject(): Partial<CompanyProject> {
-    return { title: '', description: '', tech: [], link: '#' };
+    return {
+      title: '',
+      description: '',
+      tech: [],
+      link: '#',
+      number: '',
+      displayOrder: 0,
+      status: null,
+      impact: '',
+    };
   }
   emptyPersonal(): Partial<PersonalProject> {
     return {

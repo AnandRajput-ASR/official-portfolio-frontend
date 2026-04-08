@@ -1,3 +1,5 @@
+export type ProjectStatus = 'completed' | 'in-progress' | 'planned' | 'archived' | null;
+
 export interface CompanyProject {
   id: string;
   number: string;
@@ -6,6 +8,8 @@ export interface CompanyProject {
   tech: string[];
   link: string;
   displayOrder: number;
+  status?: ProjectStatus;
+  impact?: string;
 }
 
 export interface Company {
@@ -20,4 +24,8 @@ export interface Company {
   description: string;
   projects: CompanyProject[];
   displayOrder: number;
+  website?: string;
+  teamSize?: string;
+  startDate?: string;
+  endDate?: string;
 }

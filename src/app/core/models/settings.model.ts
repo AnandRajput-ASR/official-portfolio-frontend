@@ -46,6 +46,7 @@ export interface SiteSettings {
     cardStatusText: string;
     cardStats: { value: string; label: string }[];
     cardSkills: string[];
+    extraSkills: string[];
   };
   about: {
     heading: string;

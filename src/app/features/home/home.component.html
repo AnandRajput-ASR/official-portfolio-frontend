@@ -311,33 +311,37 @@
       >
         <div class="sk-top">
           <span class="sk-icon">{{ skill.icon }}</span>
-          <div class="sk-meta-right">
-            <span class="sk-years" *ngIf="skill.yearsExp">{{ skill.yearsExp }} yrs</span>
-            <span class="sk-pct">{{ skill.proficiency || 80 }}%</span>
-          </div>
+          <span class="sk-level" [ngClass]="skillLevelClass(skill.proficiency)">
+            {{ skillLevel(skill.proficiency) }}
+          </span>
         </div>
         <h3 class="sk-name">{{ skill.name }}</h3>
+        <div class="sk-stats">
+          <span class="sk-years">{{ formatSkillExperience(skill.yearsExp) }}</span>
+          <span class="sk-pct">{{ normalizedSkillProficiency(skill.proficiency) }}%</span>
+        </div>
         <div class="sk-prof-wrap">
           <div class="sk-prof-track">
             <div
               class="sk-prof-fill"
-              [attr.data-width]="(skill.proficiency || 80) + '%'"
+              [attr.data-width]="normalizedSkillProficiency(skill.proficiency) + '%'"
               [style.background]="skill.accentColor"
             ></div>
           </div>
         </div>
         <p class="sk-desc">{{ skill.description }}</p>
         <div class="sk-tags">
-          <span *ngFor="let tag of skill.tags">{{ tag }}</span>
+          <span *ngFor="let tag of getDisplayTags(skill.tags)">{{ tag }}</span>
+          <span class="sk-tags-more" *ngIf="getExtraTagCount(skill.tags) > 0">
+            +{{ getExtraTagCount(skill.tags) }}
+          </span>
         </div>
       </div>
     </div>
     <div class="skills-extra reveal">
       <p class="se-label">Also comfortable with</p>
       <div class="se-pills">
-        <span>Git</span><span>VS Code</span><span>Postman</span><span>Grafana</span>
-        <span>QuickSight</span><span>SAP Integration</span><span>Unit Testing</span>
-        <span>PR Reviews</span><span>Technical KT</span>
+        <span *ngFor="let item of extraSkills()">{{ item }}</span>
       </div>
     </div>
   </section>
@@ -371,7 +375,22 @@
                 <span class="co-current" *ngIf="company.current">● Current</span>
               </div>
               <p class="co-role">{{ company.role }}</p>
-              <p class="co-meta">{{ company.period }} · {{ company.location }}</p>
+              <p class="co-meta">
+                {{ company.period }}
+                <span class="co-tenure-tag" *ngIf="calcTenure(company)"
+                  >· {{ calcTenure(company) }}</span
+                >
+                · {{ company.location }}
+                <a
+                  *ngIf="company.website"
+                  [href]="externalUrl(company.website)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="co-website-link"
+                  (click)="$event.stopPropagation()"
+                  >↗ website</a
+                >
+              </p>
             </div>
           </div>
           <div class="co-header-right">
@@ -393,8 +412,17 @@
                 {{ project.number }}
               </div>
               <div class="co-proj-body">
-                <h4 class="co-proj-title">{{ project.title }}</h4>
+                <h4 class="co-proj-title">
+                  {{ project.title }}
+                  <span
+                    *ngIf="project.status"
+                    class="co-proj-status"
+                    [attr.data-status]="project.status"
+                    >{{ project.status }}</span
+                  >
+                </h4>
                 <p class="co-proj-desc">{{ project.description }}</p>
+                <p class="co-proj-impact" *ngIf="project.impact">⚡ {{ project.impact }}</p>
                 <div class="co-proj-tech">
                   <span *ngFor="let t of project.tech">{{ t }}</span>
                 </div>
